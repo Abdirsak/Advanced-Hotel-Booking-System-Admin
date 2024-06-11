@@ -20,7 +20,7 @@ import {
 } from "reactstrap";
 
 //custom packages
-import { AgentsAPI } from "common/utils/axios/api";
+import { ProductsApi } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
 import useUpdate from "Hooks/useUpdate";
 
@@ -39,7 +39,7 @@ const schema = Joi.object({
 });
 
 //component
-const AgentsModal = ({
+const ProductsModal = ({
   showModal,
   setShowModal,
   selectedRow = null,
@@ -70,7 +70,7 @@ const AgentsModal = ({
   } = useForm({ defaultValues });
   // resolver: joiResolver(schema)
   const { mutate, isPending: isLoading } = useCreate(
-    AgentsAPI,
+    ProductsApi,
     "Agent Created Successfully",
     () => {
       setShowModal(false);
@@ -78,7 +78,7 @@ const AgentsModal = ({
   );
 
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
-    AgentsAPI,
+    ProductsApi,
     false,
     () => {
       setShowModal(false);
@@ -409,4 +409,4 @@ const AgentsModal = ({
   );
 };
 
-export default AgentsModal;
+export default ProductsModal;

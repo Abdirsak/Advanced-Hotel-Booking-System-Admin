@@ -23,7 +23,7 @@ import {
 } from "reactstrap";
 
 //custom packages
-import { AgentsAPI } from "common/utils/axios/api";
+import { ProductsApi } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
 import useUpdate from "Hooks/useUpdate";
 
@@ -44,7 +44,7 @@ const schema = Joi.object({
 });
 
 //component
-const AgentsFormRegistration = ({
+const ProductsRegistrationForm = ({
 
 }) => {
   const defaultValues = {
@@ -74,7 +74,7 @@ const AgentsFormRegistration = ({
   } = useForm({ defaultValues });
   // resolver: joiResolver(schema)
   const { mutate, isPending: isLoading } = useCreate(
-    AgentsAPI,
+    ProductsApi,
     "Agent Created Successfully",
     () => {
     //   setShowModal(false);
@@ -82,7 +82,7 @@ const AgentsFormRegistration = ({
   );
 
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
-    AgentsAPI,
+    ProductsApi,
     false,
     () => {
     //   setShowModal(false);
@@ -155,14 +155,14 @@ const setFileToBase = (file) =>{
 //           twitter: "twitter.com",
 //           instagram: "instagram.com",
 //         },
-//       });
+//       });s
 //     }
 //   }, [selectedRow]);
 
   return (
     <Fragment>
     <Container> 
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form onSubmit={handleSubmit(onSubmit)} className="bg-dark">
      
             <Row className="justify-content-center">
               <Col md={4} className="mb-2">
@@ -191,54 +191,61 @@ const setFileToBase = (file) =>{
                 )}
               </Col>
               <Col md={4} className="mb-2">
-                <Label className="form-label" for="address">
-                  Address
+                <Label className="form-label" for="status">
+                  Status
                 </Label>
                 <Controller
-                  name="address"
+                  name="status"
                   control={control}
                   render={({ field }) => (
                     <Input
-                      id="address"
-                      placeholder="address"
+                      id="name"
+                      type="select"
+                      placeholder="Name"
                       {...register(
-                        "address",
+                        "status",
                         { required: true },
-                        "Address is required"
+                        "Status is required"
                       )}
-                      invalid={errors.address && true}
+                      invalid={errors.status && true}
                       {...field}
-                    />
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">InActive</option>
+                    </Input>
                   )}
                 />
-                {errors.address && (
-                  <FormFeedback>{errors.address.message}</FormFeedback>
+                {errors.status && (
+                  <FormFeedback>{errors.status.message}</FormFeedback>
                 )}
-              </Col>
-              <Col xs={4} className="mb-2">
-                <Label className="form-label" for="contactInfo">
-                  Contact
+              </Col> 
+              <Col md={4} className="mb-2">
+                <Label className="form-label" for="title">
+                  Title
                 </Label>
                 <Controller
-                  name="contactInfo"
+                  name="title"
                   control={control}
                   render={({ field }) => (
                     <Input
-                      id="contactInfo"
-                      type="text"
-                      placeholder="contactInfo"
+                      id="name"
+                      type="select"
+                      placeholder="Name"
                       {...register(
-                        "contactInfo",
+                        "title",
                         { required: true },
-                        "contactInfo is required"
+                        "title is required"
                       )}
-                      invalid={errors.contactInfo && true}
+                      invalid={errors.title && true}
                       {...field}
-                    />
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">InActive</option>
+                    </Input>
                   )}
                 />
-                {errors.contactInfo && (
-                  <FormFeedback>{errors.contactInfo.message}</FormFeedback>
+                {errors.title && (
+                  <FormFeedback>{errors.title.message}</FormFeedback>
                 )}
               </Col>
              
@@ -537,4 +544,4 @@ const setFileToBase = (file) =>{
   );
 };
 
-export default AgentsFormRegistration;
+export default ProductsRegistrationForm;

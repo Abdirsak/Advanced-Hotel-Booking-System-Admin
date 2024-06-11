@@ -7,17 +7,17 @@ import { Container } from "react-bootstrap";
 
 //custom packages
 import { PageHeading } from "widgets";
-import AgentsTable from "./AgentsTable";
+import ProductsTable from "./ProductsTable";
 
-const Agents = () => {
+const Products = () => {
   return (
     <Container fluid className="p-6">
       {/* <PageHeading heading="Categories" /> */}
       <div className="py-2">
-        <AgentsTable />
+        <ProductsTable />
       </div>
     </Container>
   );
 };
 
-export default Agents;
+export default Products;
