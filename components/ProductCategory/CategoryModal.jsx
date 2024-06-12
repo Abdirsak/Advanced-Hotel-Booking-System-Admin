@@ -20,14 +20,14 @@ import {
 } from "reactstrap";
 
 //custom packages
-import { CategoryAPI } from "common/utils/axios/api";
+import { ProductCategoryApi } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
 import useUpdate from "Hooks/useUpdate";
 
 //validation schema
 const schema = Joi.object({
   name: Joi.string().min(2).max(20).required().label("Name"),
-  status: Joi.string().label("Status"),
+  description: Joi.string().label("description"),
 });
 
 //component
@@ -39,7 +39,7 @@ const CategoryModal = ({
 }) => {
   const defaultValues = {
     name: selectedRow?.name || "",
-    status: selectedRow?.status || "active",
+    description: selectedRow?.description || "",
   };
 
   const {
@@ -53,7 +53,7 @@ const CategoryModal = ({
   } = useForm({ defaultValues, resolver: joiResolver(schema) });
 
   const { mutate, isPending: isLoading } = useCreate(
-    CategoryAPI,
+    ProductCategoryApi,
     "Category Created Successfully",
     () => {
       setShowModal(false);
@@ -61,7 +61,7 @@ const CategoryModal = ({
   );
 
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
-    CategoryAPI,
+    ProductCategoryApi,
     "Category Updated Successfully",
     () => {
       setShowModal(false);
@@ -93,7 +93,7 @@ const CategoryModal = ({
       reset({
         ...defaultValues,
         name: selectedRow?.name || "",
-        status: selectedRow?.status || "active",
+        description: selectedRow?.description || "",
       });
     }
   }, [selectedRow]);
@@ -139,33 +139,29 @@ const CategoryModal = ({
               </Col>
 
               <Col xs={12} className="mb-2">
-                <Label className="form-label" for="status">
-                  Status
+                <Label className="form-label" for="description">
+                  Description
                 </Label>
                 <Controller
-                  name="status"
+                  name="description"
                   control={control}
                   render={({ field }) => (
                     <Input
-                      id="name"
-                      type="select"
-                      placeholder="Name"
-                      {...register(
-                        "status",
-                        { required: true },
-                        "Status is required"
-                      )}
-                      invalid={errors.status && true}
-                      {...field}
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">InActive</option>
-                    </Input>
-                  )}
-                />
-                {errors.status && (
-                  <FormFeedback>{errors.status.message}</FormFeedback>
+                    id="description"
+                    placeholder="description"
+                    {...register(
+                      "description",
+                      { required: true },
+                      "description is required"
+                    )}
+                    invalid={errors.description && true}
+                    {...field}
+                  />
                 )}
+              />
+              {errors.description && (
+                <FormFeedback>{errors.description.message}</FormFeedback>
+              )}
               </Col>
             </Row>
           </ModalBody>

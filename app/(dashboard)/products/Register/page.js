@@ -1,81 +1,106 @@
 "use client";
 
-import { Fragment, useState,useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import Select from 'react-select';
 import Joi from "joi";
 import {
   Button, Col, Form, FormFeedback, Input, Label, Row, Spinner, Container
 } from "reactstrap";
-import { ProductsApi,SuppliersApi } from "common/utils/axios/api";
+import { ProductsApi, SuppliersApi, ProductCategoryApi, UserAPI } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
 import useUpdate from "Hooks/useUpdate";
 import { useQuery } from "@tanstack/react-query"; // or "react-query" if using older version
-import request  from "common/utils/axios/index";
+import request from "common/utils/axios/index";
+
 const fetchSuppliers = async () => {
-    const response = await request({
-      method: 'GET',
-      url: SuppliersApi,
-    });
-    return response.data;
-  };
-  
-  const useQueryFunc = () => {
-    return useQuery({
-      queryKey: 'supplier',
-      queryFn: fetchSuppliers,
-    });
-  };
+  const response = await request({
+    method: 'GET',
+    url: SuppliersApi,
+  });
+  return response.data;
+};
+
+const fetchProductCategories = async () => {
+  const response = await request({
+    method: 'GET',
+    url: ProductCategoryApi,
+  });
+  return response.data;
+};
+
+const fetchUsers = async () => {
+  const response = await request({
+    method: 'GET',
+    url: UserAPI,
+  });
+  return response.data;
+};
+const useSuppliers = () => {
+  return useQuery({
+    queryKey: 'suppliers',
+    queryFn: fetchSuppliers,
+  });
+};
+
+const useProductCategories = () => {
+  return useQuery({
+    queryKey: 'productCategories',
+    queryFn: fetchProductCategories,
+  });
+};
+
+const useUsers = () => {
+  return useQuery({
+    queryKey: 'users',
+    queryFn: fetchUsers,
+  });
+};
 // Validation schema using Joi
 const schema = Joi.object({
   name: Joi.string().min(2).max(50).required().label("Name"),
-  quantity: Joi.number().min(1).required().label("quantity"),
-  price: Joi.number().min(1).required().label("price"),
-  address: Joi.number().min(1).required().label("Address"),
-  contactInfo: Joi.string().min(3).max(20).required().label("Contact Info"),
-  title: Joi.string().min(3).max(20).required().label("Title"),
-  experience: Joi.number().required().label("Experience"),
-  about: Joi.string().label("About"),
-  specialties: Joi.array().items(Joi.string()).label("Specialties"),
-  cost: Joi.number().min(1).required().label("cost"),
+  quantity: Joi.number().min(1).required().label("Quantity"),
+  price: Joi.number().min(1).required().label("Price"),
+ 
+  expireDate: Joi.date().required().label("expireDate"),
+  description: Joi.string().allow('', null).label("Description"),
+  
+  cost: Joi.number().min(1).required().label("Cost"),
   profilePicture: Joi.string().allow('', null).label("Profile Image"),
-  status: Joi.string().valid('active', 'inactive').required().label("Status")
-}).unknown(); 
+  category: Joi.string().required().label("Category"),
+  supplier: Joi.string().required().label("supplier"),
+  brand: Joi.string().required().valid("New", "Old").label("Brand")
+}).unknown();
 
 const ProductsRegistrationForm = () => {
-    const [suppliers,setSuppliers] =  useState([])
-
-    const { data, error } = useQueryFunc();
-
-    useEffect(()=>{
-        setSuppliers(data?.data?.docs)
-    },[data])
-    console.log(suppliers)
-
-    // if (isLoading) {
-    //     return <div>Loading...</div>;
-    // }
-
-    // if (error) {
-    //     return <div>Error: {error.message}</div>;
-    // }
   const [formData, setFormData] = useState({
-    name: "", quantity: "", price: "", address: "", about: "",
-    contactInfo: "", cost: "", profilePicture: "", status: "active",
-    experience: 0, title: "", specialties: []
+    name: "", quantity: 0, price: 0,  description: "", cost: 0, profilePicture: "", category: "",supplier:"",
+    expireDate:"", brand: "New",createdBy:"65fe91208f8240812e267742"
   });
-
+  const handleDateChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
   const [errors, setErrors] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [image, setImage] = useState(null);
 
+  const { data: suppliersData } = useSuppliers();
+  const { data: productCategories } = useProductCategories();
+  const { data: usersData } = useUsers();
+
+  // console.log(suppliersData)
+  const suppliersOptions = suppliersData?.data?.docs?.map(supplier => ({ value: supplier._id, label: supplier.SupplierName }));
+  const categoriesOptions = productCategories?.data?.docs?.map(category => ({ value: category._id, label: category.name }));
+  const usersOptions = usersData?.data?.docs?.map(user => ({ value: user._id, label: user.username }));
+
   const { mutate, isPending: isLoading } = useCreate(
-    ProductsApi, "Products Created Successfully", () => {}
+    ProductsApi, "Product Created Successfully", () => {}
   );
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
     ProductsApi, false, () => {}
   );
 
-  const options = [
+  const specialtiesOptions = [
     { value: 'Renting', label: 'Renting' },
     { value: 'Selling', label: 'Selling' },
     { value: 'Keeping', label: 'Keeping' },
@@ -92,59 +117,19 @@ const ProductsRegistrationForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // const handleImage = (e) => {
-  //   const file = e.target.files[0];
-  //   const reader = new FileReader();
-  //   reader.readAsDataURL(file);
-  //   reader.onloadend = () => {
-  //     setImage(reader.result);
-  //     setFormData({ ...formData, profilePicture: reader.result });
-  //   };
-  // };
-
-//   const handleImage = (e) =>{
-//     const file = e.target.files[0];
-//     setFileToBase(file);
-//     console.log(file);
-// }
-
-// const setFileToBase = (file) =>{
-//     const reader = new FileReader();
-//     reader.readAsDataURL(file);
-//     reader.onloadend = () =>{
-//       setFormData({ ...formData, profilePicture: reader.result })
-//         // setImage(reader.result);
-//     }
-
-// }
-// const [image, setImage] = useState(null);
-    const [imageBase64, setImageBase64] = useState("");
-
-    // convert image file to base64
-    const setFileToBase64 = (file) => {
+  const setFileToBase64 = (file) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      // setImage(reader.result); 
-      setFormData({ ...formData, profilePicture: reader.result })
-      // setImageBase64(reader.result);
+      setFormData({ ...formData, profilePicture: reader.result });
     };
   };
 
-  // receive file from form
-    const handleImage = (e) => {
-      
+  const handleImage = (e) => {
     const file = e.target.files[0];
-    // setImage(file);
     setFileToBase64(file);
   };
-const setFileToBase = (file) =>{
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () =>{
-        setImage(reader.result);
-    }
-  }
+
   const validate = () => {
     const result = schema.validate(formData, { abortEarly: false });
     if (!result.error) return null;
@@ -157,26 +142,18 @@ const setFileToBase = (file) =>{
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
     const newErrors = validate();
-    setErrors(newErrors || {});
     console.log(newErrors)
+    setErrors(newErrors || {});
     if (newErrors) return;
-
-
-     // Log formData to check if data is correct
-
-  
-    
-      mutate(formData);
-    
+    console.log(formData)
+    mutate(formData);
   };
 
   const onDiscard = () => {
     setFormData({
-      name: "", quantity: "", price: "", address: "", about: "",
-      contactInfo: "", cost: "", profilePicture: "", status: "active",
-      experience: 0, title: "", specialties: []
+      name: "", quantity: 0, price: 0, description: "", cost: 0, profilePicture: "", category: "",supplier:"",
+      expireDate:"",  brand: ""
     });
     setErrors({});
   };
@@ -187,7 +164,7 @@ const setFileToBase = (file) =>{
         <Form onSubmit={handleSubmit} className="m-5 shadow-lg p-2">
           <Row className="justify-content-center">
             <Col md={4} lg={4} sm={12} className="mb-2">
-              <Label className="form-label" for="name">Agent Name</Label>
+              <Label className="form-label" for="name">Product Name</Label>
               <Input
                 id="name"
                 name="name"
@@ -199,162 +176,137 @@ const setFileToBase = (file) =>{
               {errors.name && <FormFeedback>{errors.name}</FormFeedback>}
             </Col>
             <Col md={4} lg={4} sm={12} className="mb-2">
-              <Label className="form-label" for="status">Status</Label>
-              <Input
-                id="status"
-                name="status"
-                type="select"
-                value={formData.status}
-                onChange={handleInputChange}
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </Input>
+              <Label className="form-label" for="category">Category</Label>
+              <Select
+                id="category"
+                name="category"
+                options={categoriesOptions}
+                value={categoriesOptions?.find(option => option.value === formData.category)}
+                onChange={(selected) => setFormData({ ...formData, category: selected.value })}
+                invalid={!!errors.category}
+              />
+              {errors.category && <FormFeedback>{errors.category}</FormFeedback>}
             </Col>
             <Col md={4} lg={4} sm={12} className="mb-2">
-              <Label className="form-label" for="title">Title</Label>
-              <Input
-                id="title"
-                name="title"
-                type="select"
-                value={formData.title}
-                onChange={handleInputChange}
-                invalid={!!errors.title}
-              >
-                <option value="Agent">Agent</option>
-                <option value="Seller">Seller</option>
-              </Input>
-              {errors.title && <FormFeedback>{errors.title}</FormFeedback>}
+              <Label className="form-label" for="supplier">Supplier</Label>
+              <Select
+                id="supplier"
+                name="supplier"
+                options={suppliersOptions}
+                value={suppliersOptions?.find(option => option.value === formData.supplier)}
+                onChange={(selected) => setFormData({ ...formData, supplier: selected.value })}
+                invalid={!!errors.supplier}
+              />
+              {errors.supplier && <FormFeedback>{errors.supplier}</FormFeedback>}
             </Col>
           </Row>
 
           <Row className="justify-content-center">
             <Col md={3} lg={3} sm={12} className="mb-2">
+              <Label className="form-label" for="brand">Brand</Label>
+              <Input
+                id="brand"
+                name="brand"
+                type="select"
+                value={formData.brand}
+                onChange={handleInputChange}
+                invalid={!!errors.brand}
+              
+              >
+                <option value="New">New</option>
+                <option value="Old">Old</option>
+              </Input>
+             
+              {errors.brand && <FormFeedback>{errors.brand}</FormFeedback>}
+            </Col>
+            <Col md={2} lg={2} sm={12} className="mb-2">
               <Label className="form-label" for="quantity">Quantity</Label>
               <Input
                 id="quantity"
                 name="quantity"
                 type="number"
-                placeholder="quantity"
+                placeholder="Quantity"
                 value={formData.quantity}
                 onChange={handleInputChange}
                 invalid={!!errors.quantity}
               />
               {errors.quantity && <FormFeedback>{errors.quantity}</FormFeedback>}
             </Col>
-            <Col md={3} lg={3} sm={12} className="mb-2">
+            <Col md={2} lg={2} sm={12} className="mb-2">
               <Label className="form-label" for="price">Price</Label>
               <Input
                 id="price"
                 name="price"
                 type="number"
-                placeholder="price"
+                placeholder="Price"
                 value={formData.price}
                 onChange={handleInputChange}
                 invalid={!!errors.price}
               />
               {errors.price && <FormFeedback>{errors.price}</FormFeedback>}
             </Col>
-            <Col md={3} lg={3} sm={12} className="mb-2">
+            <Col md={2} lg={2} sm={12} className="mb-2">
               <Label className="form-label" for="cost">Cost</Label>
               <Input
                 id="cost"
                 name="cost"
                 type="number"
-                placeholder="Social Media"
+                placeholder="Cost"
                 value={formData.cost}
                 onChange={handleInputChange}
+                invalid={!!errors.cost}
               />
+              {errors.cost && <FormFeedback>{errors.cost}</FormFeedback>}
             </Col>
             <Col md={3} lg={3} sm={12} className="mb-2">
-              <Label className="form-label" for="cost">Social Media</Label>
+              <Label className="form-label" for="expireDate">expireDate</Label>
               <Input
-                id="cost"
-                name="cost"
-                type="text"
-                placeholder="Social Media"
-                value={formData.cost}
-                onChange={handleInputChange}
+                id="expireDate"
+                name="expireDate"
+                type="date"
+               onChange={handleDateChange}
+                
+                placeholder="expireDate"
+                value={formData.expireDate}
+                invalid={!!errors.expireDate}
               />
+              {errors.expireDate && <FormFeedback>{errors.expireDate}</FormFeedback>}
             </Col>
           </Row>
 
           <Row className="justify-content-center">
-            <Col md={3} lg={3} sm={12} className="mb-2">
-              <Label className="form-label" for="status">Status</Label>
-              <Input
-                id="status"
-                name="status"
-                type="select"
-                value={formData.status}
-                onChange={handleInputChange}
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </Input>
-            </Col>
-            <Col md={3} lg={3} sm={12} className="mb-2">
-              <Label className="form-label" for="title">Title</Label>
-              <Input
-                id="title"
-                name="title"
-                type="select"
-                value={formData.title}
-                onChange={handleInputChange}
-                invalid={!!errors.title}
-              >
-                <option value="Agent">Agent</option>
-                <option value="Seller">Seller</option>
-              </Input>
-              {errors.title && <FormFeedback>{errors.title}</FormFeedback>}
-            </Col>
-            <Col md={3} lg={3} sm={12} className="mb-2">
-              <Label className="form-label" for="experience">Experience</Label>
-              <Input
-                id="experience"
-                name="experience"
-                type="number"
-                placeholder="Experience"
-                value={formData.experience}
-                onChange={handleInputChange}
-                invalid={!!errors.experience}
-              />
-              {errors.experience && <FormFeedback>{errors.experience}</FormFeedback>}
-            </Col>
-            <Col md={3} lg={3} sm={12} className="mb-2">
-              <Label className="form-label" for="specialties">Specialties</Label>
+      
+            {/* <Col md={4} lg={4} sm={12} className="mb-2">
+              <Label className="form-label" for="createdBy">Created By</Label>
               <Select
-                isMulti
-                options={options}
-                className="basic-multi-select"
-                classNamePrefix="select"
-                value={selectedOptions}
-                onChange={handleChange}
+                id="createdBy"
+                name="createdBy"
+                options={categoriesOptions}
+                value={categoriesOptions?.find(option => option.value === formData.createdBy)}
+                onChange={(selected) => setFormData({ ...formData, createdBy: selected.value })}
+                invalid={!!errors.createdBy}
               />
-              {errors.specialties && <FormFeedback>{errors.specialties}</FormFeedback>}
-            </Col>
-          </Row>
-
-          <Row className="justify-content-center">
+              {errors.createdBy && <FormFeedback>{errors.createdBy}</FormFeedback>}
+            </Col> */}
             <Col xs={12} className="mb-2">
-              <Label className="form-label" for="about">About</Label>
+              <Label className="form-label" for="description">Description</Label>
               <Input
-                id="about"
-                name="about"
+                id="description"
+                name="description"
                 type="textarea"
                 rows="3"
-                placeholder="About"
-                value={formData.about}
+                placeholder="Description"
+                value={formData.description}
                 onChange={handleInputChange}
-                invalid={!!errors.about}
+                invalid={!!errors.description}
               />
-              {errors.about && <FormFeedback>{errors.about}</FormFeedback>}
+              {errors.description && <FormFeedback>{errors.description}</FormFeedback>}
             </Col>
           </Row>
 
           <Row className="justify-content-center">
             <Col md={6} lg={6} sm={12}>
-              <Label className="form-label">Applicant Image <span className="text-danger">*</span></Label>
+              <Label className="form-label">Profile Picture</Label>
               <Input
                 type="file"
                 name="image"

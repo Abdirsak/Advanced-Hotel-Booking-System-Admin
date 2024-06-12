@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 
 //custom packages
 import Table from "common/Table";
-import { CategoryAPI } from "common/utils/axios/api";
+import { ProductCategoryApi } from "common/utils/axios/api";
 import CategoryModal from "./CategoryModal";
 import useDelete from "hooks/useDelete";
 
@@ -21,7 +21,7 @@ const CategoryTable = () => {
   const router = useRouter();
 
   //delete mutation
-  const { mutate, isPending: isLoading } = useDelete(CategoryAPI, false, () => {
+  const { mutate, isPending: isLoading } = useDelete(ProductCategoryApi, false, () => {
     //   setShowModal(false);
     //   setSelectedRow(null);
   });
@@ -58,18 +58,11 @@ const CategoryTable = () => {
     },
 
     {
-      name: "Status",
+      name: "Description",
       sortable: true,
-      sortField: "status",
-      selector: (row) => row.status,
-      cell: (row) => (
-        <Badge
-          color={row?.status?.toLowerCase() == "active" ? "success" : "warning"}
-          className="text-capitalize"
-        >
-          <span className="">{row.status}</span>
-        </Badge>
-      ),
+      sortField: "description",
+      selector: (row) => row.description,
+      cell: (row) => <div className="">{row?.description ?? ""}</div>,
     },
     {
       name: "Created Date",
@@ -130,7 +123,7 @@ const CategoryTable = () => {
         populate={[]}
         query={{}}
         title="Categories"
-        url={CategoryAPI}
+        url={ProductCategoryApi}
         searchFields={["name"]}
       />
     </>
