@@ -1,4 +1,4 @@
-export const UserAPI = "/users";
+export const UsersAPI = "/users";
 export const EmployeesApi = "/employees";
 export const customersApi = "/customers";
 export const ProductCategoryApi = "/productCategories";

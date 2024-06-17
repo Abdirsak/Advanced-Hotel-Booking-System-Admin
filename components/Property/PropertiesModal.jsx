@@ -23,7 +23,7 @@ import {
 import {
   PropertiesAPI,
   AgentsAPI,
-  UserAPI,
+  UsersApi,
   CategoryAPI,
 } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
@@ -101,8 +101,8 @@ const PropertiesModal = ({
     select: (res) => res?.data?.data.docs,
   });
   const { data: Owners } = useQuery({
-    queryKey: [UserAPI],
-    queryFn: () => request({ url: UserAPI, method: "GET" }),
+    queryKey: [UsersApi],
+    queryFn: () => request({ url: UsersApi, method: "GET" }),
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,

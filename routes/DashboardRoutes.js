@@ -53,8 +53,8 @@ export const DashboardMenu = [
       { id: uuid(), link: "/users", name: "Users" },
       { id: uuid(), link: "/customers", name: "Customers" },
       { id: uuid(), link: "/suppliers", name: "Suppliers" },
-      { id: uuid(), link: "/expenseCategory", name: "Expense Category" },
-      { id: uuid(), link: "/productCategory", name: "Product Category" }
+      { id: uuid(), link: "/expenseCategories", name: "Expense Category" },
+      { id: uuid(), link: "/productCategories", name: "Product Category" }
     ],
   },
   {

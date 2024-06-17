@@ -9,19 +9,19 @@ import Swal from "sweetalert2";
 
 //custom packages
 import Table from "common/Table";
-import { UsersAPI } from "common/utils/axios/api";
-import UsersModal from "./UsersModal";
+import { BranchesApi } from "common/utils/axios/api";
+import BranchesModal from "./BranchesModal";
 import useDelete from "hooks/useDelete";
 
 //
 
-const UsersTable = () => {
+const BranchesTable = () => {
   const [showModal, setShowModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedBranch, selSelectedBranch] = useState(null);
   const router = useRouter();
 
   //delete mutation
-  const { mutate, isPending: isLoading } = useDelete(UsersAPI, false, () => {
+  const { mutate, isPending: isLoading } = useDelete(BranchesApi, false, () => {
     //   setShowModal(false);
     //   setSelectedRow(null);
   });
@@ -29,7 +29,7 @@ const UsersTable = () => {
   //delete function
   const handleConfirmDelete = async (id, name) => {
     return Swal.fire({
-      title: `Delete User ${name}?`,
+      title: `Delete Branch ${name}?`,
       text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
@@ -50,59 +50,49 @@ const UsersTable = () => {
   //columns
   const columns = [
     {
-      name: "name",
+      name: "Name",
       sortable: true,
-      width: "20%",
       sortField: "name",
       selector: (row) => row?.name ?? "",
       cell: (row) => <div className="">{row?.name ?? ""}</div>,
-      cell: (row) => (
-        <div className="d-flex align-items-center">
-          <div className="ms-0">
-            <div className="fw-bold">{row?.name ?? ""}</div>
-            <div className="font-small-2 text-muted">{row?.email || ""}</div>
-          </div>
-        </div>
-      ),
     },
 
     {
-      name: "phone",
+      name: "Contact",
       sortable: true,
-      sortField: "phone",
-      selector: (row) => row?.phone ?? "",
-      cell: (row) => <div className="">{row?.phone ?? "-"}</div>,
-    },
-
-    {
-      name: "role",
-      sortable: true,
-      sortField: "role",
-      selector: (row) => row?.role ?? "-",
-      cell: (row) => <div className="">{row?.role ?? "-"}</div>,
-    },
-
-    {
-      name: "Status",
-      sortable: true,
-      sortField: "status",
-      selector: (row) => row.status,
-      cell: (row) => (
-        <Badge
-          color={row?.status?.toLowerCase() == "active" ? "success" : "warning"}
-          className="text-capitalize"
-        >
-          <span className="">{row.status}</span>
-        </Badge>
-      ),
+      sortField: "contact",
+      selector: (row) => row.contact,
+      cell: (row) => <div className="">{row?.contact ?? ""}</div>,
     },
     {
-      name: "Reg. Date",
+      name: "Address",
+      sortable: true,
+      sortField: "address",
+      selector: (row) => row.address,
+      cell: (row) => <div className="">{row?.address ?? ""}</div>,
+    },
+    {
+      name: "Director",
+      sortable: true,
+      sortField: "director",
+      selector: (row) => row.director,
+      cell: (row) => <div className="">{row?.director ?? ""}</div>,
+    },
+    {
+      name: "Working Hours",
+      sortable: true,
+      sortField: "workingHours",
+      selector: (row) => row?.workingHours?.from +"--"+ row?.workingHours?.to,
+      cell: (row) => <div className="">{row?.workingHours?.from +"--"+ row?.workingHours?.to ?? ""}</div>,
+    },
+    {
+      name: "Created Date",
       sortable: true,
       sortField: "createdAt",
       selector: (row) => row.createdAt,
       cell: (row) => (
         <span className="text-capitalize">
+          {" "}
           {moment(row.createdAt).format("DD-MMM-YYYY")}
         </span>
       ),
@@ -124,7 +114,7 @@ const UsersTable = () => {
             size={18}
             onClick={(e) => {
               // router.push("/create");
-              setSelectedUser(row);
+              selSelectedBranch(row);
               setShowModal(true);
             }}
           />
@@ -142,23 +132,23 @@ const UsersTable = () => {
   ];
   return (
     <>
-      <UsersModal
+      <BranchesModal
         showModal={showModal}
         setShowModal={setShowModal}
-        selectedRow={selectedUser}
-        setSelectedRow={setSelectedUser}
+        selectedRow={selectedBranch}
+        setSelectedRow={selSelectedBranch}
       />
       <Table
         columns={columns}
         onCreateAction={() => setShowModal(true)}
         populate={[]}
         query={{}}
-        title="Categories"
-        url={UsersAPI}
+        title="Branches"
+        url={BranchesApi}
         searchFields={["name"]}
       />
     </>
   );
 };
 
-export default UsersTable;
+export default BranchesTable;

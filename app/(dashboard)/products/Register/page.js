@@ -6,7 +6,7 @@ import Joi from "joi";
 import {
   Button, Col, Form, FormFeedback, Input, Label, Row, Spinner, Container
 } from "reactstrap";
-import { ProductsApi, SuppliersApi, ProductCategoryApi, UserAPI } from "common/utils/axios/api";
+import { ProductsApi, SuppliersApi, ProductCategoryApi, UsersAPI } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
 import useUpdate from "Hooks/useUpdate";
 import { useQuery } from "@tanstack/react-query"; // or "react-query" if using older version
@@ -31,7 +31,7 @@ const fetchProductCategories = async () => {
 const fetchUsers = async () => {
   const response = await request({
     method: 'GET',
-    url: UserAPI,
+    url: UsersAPI,
   });
   return response.data;
 };

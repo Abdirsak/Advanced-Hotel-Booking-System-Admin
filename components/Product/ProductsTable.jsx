@@ -1,32 +1,28 @@
 import React, { useState } from "react";
-import { Button} from "reactstrap";
-//3rd party libraries
+import { Button } from "reactstrap";
+// 3rd party libraries
 import { Edit2, Plus, Trash2 } from "react-feather";
 import { Badge } from "reactstrap";
 import moment from "moment";
 import Swal from "sweetalert2";
-import Link from "next/link"
-//custom packages
+import Link from "next/link";
+// custom packages
 import Table from "common/Table";
 import { ProductsApi } from "common/utils/axios/api";
 
 import ProductsModal from "./ProductsModal";
-import ProductsRegistrationForm from "./ProductsRegistrationForm"
 import useDelete from "hooks/useDelete";
-//
 
 const ProductsTable = () => {
-  
   const [showModal, setShowModal] = useState(false);
   const [SelectedAgent, setSelectedAgent] = useState(null);
-  //delete mutation
+  // delete mutation
   const { mutate, isPending: isLoading } = useDelete(ProductsApi, false, () => {
-    //   setShowModal(false);
-    //   setSelectedRow(null);
+    // setShowModal(false);
+    // setSelectedRow(null);
   });
 
-
-  //delete function
+  // delete function
   const handleConfirmDelete = async (id, name) => {
     return Swal.fire({
       title: `Delete Agent ${name}?`,
@@ -38,7 +34,6 @@ const ProductsTable = () => {
         confirmButton: "btn btn-danger",
         cancelButton: "btn btn-primary ms-1",
       },
-
       buttonsStyling: false,
     }).then(async (result) => {
       if (result.value) {
@@ -47,6 +42,9 @@ const ProductsTable = () => {
     });
   };
 
+  const formatDecimal = (value) => {
+    return value?.$numberDecimal ?? value;
+  };
 
   const columns = [
     {
@@ -67,7 +65,7 @@ const ProductsTable = () => {
     {
       name: "Supplier",
       sortable: true,
-      sortField: "SupplerName",
+      sortField: "supplier.SupplierName",
       selector: (row) => row?.supplier?.SupplierName ?? "",
       cell: (row) => <div className="">{row?.supplier?.SupplierName ?? ""}</div>,
     },
@@ -85,7 +83,6 @@ const ProductsTable = () => {
       selector: (row) => row.expireDate,
       cell: (row) => (
         <span className="text-capitalize">
-          {" "}
           {moment(row.expireDate).format("DD-MMM-YYYY")}
         </span>
       ),
@@ -95,21 +92,21 @@ const ProductsTable = () => {
       sortable: true,
       sortField: "quantity",
       selector: (row) => row?.quantity ?? "",
-      cell: (row) => <div className="">{row?.quantity ?? ""}</div>,
+      cell: (row) => <div className="">{row?.quantity?? ""}</div>,
     },
     {
       name: "Price",
       sortable: true,
       sortField: "price",
-      selector: (row) => row?.price ?? "",
-      cell: (row) => <div className="">{row?.price ?? ""}</div>,
+      selector: (row) => formatDecimal(row?.price) ?? "",
+      cell: (row) => <div className="">{formatDecimal(row?.price) ?? ""}</div>,
     },
     {
       name: "Cost",
       sortable: true,
       sortField: "cost",
-      selector: (row) => row?.cost ?? "",
-      cell: (row) => <div className="">{row?.cost ?? ""}</div>,
+      selector: (row) => formatDecimal(row?.cost) ?? "",
+      cell: (row) => <div className="">{formatDecimal(row?.cost) ?? ""}</div>,
     },
     {
       name: "CreatedBy",
@@ -118,24 +115,6 @@ const ProductsTable = () => {
       selector: (row) => row?.createdBy?.username ?? "",
       cell: (row) => <div className="">{row?.createdBy?.username ?? ""}</div>,
     },
-  
-
-    // {
-    //   name: "Status",
-    //   sortable: true,
-    //   sortField: "status",
-    //   selector: (row) => row.status,
-    //   cell: (row) => (
-    //     <Badge
-    //       color={
-    //         row?.status?.toLowerCase() == "inactive" ? "warning" : "success"
-    //       }
-    //       className="text-capitalize"
-    //     >
-    //       <span className="">{row.status || "Active"}</span>
-    //     </Badge>
-    //   ),
-    // },
     {
       name: "Created Date",
       sortable: true,
@@ -143,12 +122,10 @@ const ProductsTable = () => {
       selector: (row) => row.createdAt,
       cell: (row) => (
         <span className="text-capitalize">
-          {" "}
           {moment(row.createdAt).format("DD-MMM-YYYY")}
         </span>
       ),
     },
-
     {
       name: "Actions",
       cell: (row) => (
@@ -180,28 +157,19 @@ const ProductsTable = () => {
       ),
     },
   ];
+
   return (
     <>
-      {/* <AgentsModal
-        showModal={showModal}
-        setShowModal={setShowModal}
-        selectedRow={SelectedAgent}
-        setSelectedRow={setSelectedAgent}
-      /> */}
-      {/* <AgentsRegistrationForm/> */}
       <div>
-      <Button color="primary"  className="px-4 justify-end text-white">
-        
-      <Link href={"/products/Register"}  color="primary" className="px-4 text-white">
-    <Plus /> New Products
-  </Link>
-            </Button>
-        
+        <Button color="primary" className="px-4 justify-end text-white">
+          <Link href={"/products/Register"} color="primary" className="px-4 text-white">
+            <Plus /> New Products
+          </Link>
+        </Button>
       </div>
-     
+
       <Table
         columns={columns}
-        // onCreateAction={() => setShowModal(true)}
         populate={[]}
         query={{}}
         title="Products"
