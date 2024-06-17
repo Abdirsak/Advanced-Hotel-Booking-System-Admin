@@ -54,7 +54,7 @@ const useEmployees = () => {
 };
 
 // component
-const BranchesModal = ({
+const EmployeesModal = ({
   showModal,
   setShowModal,
   selectedRow = null,
@@ -316,4 +316,4 @@ const BranchesModal = ({
   );
 };
 
-export default BranchesModal;
+export default EmployeesModal;

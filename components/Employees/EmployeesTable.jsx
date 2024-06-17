@@ -9,19 +9,19 @@ import Swal from "sweetalert2";
 
 //custom packages
 import Table from "common/Table";
-import { BranchesApi } from "common/utils/axios/api";
-import BranchesModal from "./BranchesModal";
+import { EmployeesApi } from "common/utils/axios/api";
+import EmployeesModal from "./EmployeesModal";
 import useDelete from "hooks/useDelete";
 
 //
 
-const BranchesTable = () => {
+const EmployeesTable = () => {
   const [showModal, setShowModal] = useState(false);
-  const [selectedBranch, selSelectedBranch] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const router = useRouter();
 
   //delete mutation
-  const { mutate, isPending: isLoading } = useDelete(BranchesApi, false, () => {
+  const { mutate, isPending: isLoading } = useDelete(EmployeesApi, false, () => {
     //   setShowModal(false);
     //   setSelectedRow(null);
   });
@@ -29,7 +29,7 @@ const BranchesTable = () => {
   //delete function
   const handleConfirmDelete = async (id, name) => {
     return Swal.fire({
-      title: `Delete Branch ${name}?`,
+      title: `Delete Employee ${name}?`,
       text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
@@ -53,16 +53,30 @@ const BranchesTable = () => {
       name: "Name",
       sortable: true,
       sortField: "name",
-      selector: (row) => row?.name ?? "",
-      cell: (row) => <div className="">{row?.name ?? ""}</div>,
+      selector: (row) => row?.fullName ?? "",
+      cell: (row) => <div className="">{row?.fullName ?? ""}</div>,
     },
 
+    {
+      name: "Gender",
+      sortable: true,
+      sortField: "gender",
+      selector: (row) => row.gender,
+      cell: (row) => <div className="">{row?.gender ?? ""}</div>,
+    },
     {
       name: "Contact",
       sortable: true,
       sortField: "contact",
       selector: (row) => row.contact,
       cell: (row) => <div className="">{row?.contact ?? ""}</div>,
+    },
+    {
+      name: "Emergencey Contact",
+      sortable: true,
+      sortField: "emergencyContact",
+      selector: (row) => row.emergencyContact,
+      cell: (row) => <div className="">{row?.emergencyContact ?? ""}</div>,
     },
     {
       name: "Address",
@@ -72,18 +86,38 @@ const BranchesTable = () => {
       cell: (row) => <div className="">{row?.address ?? ""}</div>,
     },
     {
-      name: "Director",
+      name: "Salary",
       sortable: true,
-      sortField: "director",
-      selector: (row) => row?.director?.fullName,
-      cell: (row) => <div className="">{row?.director?.fullName ?? ""}</div>,
+      sortField: "salary",
+      selector: (row) => row.salary,
+      cell: (row) => <div className="">{row?.salary ?? ""}</div>,
     },
     {
-      name: "Working Hours",
+      name: "Department",
       sortable: true,
-      sortField: "workingHours",
-      selector: (row) => row?.workingHours?.from +"--"+ row?.workingHours?.to,
-      cell: (row) => <div className="">{row?.workingHours?.from +"--"+ row?.workingHours?.to ?? ""}</div>,
+      sortField: "department",
+      selector: (row) => row?.department,
+      cell: (row) => <div className="">{row?.department ?? ""}</div>,
+    },
+    {
+      name: "Position",
+      sortable: true,
+      sortField: "position",
+      selector: (row) => row?.position,
+      cell: (row) => <div className="">{row?.position ?? ""}</div>,
+    },
+   
+    {
+      name: "Hire Date",
+      sortable: true,
+      sortField: "hireDate",
+      selector: (row) => row.hireDate,
+      cell: (row) => (
+        <span className="text-capitalize">
+          {" "}
+          {moment(row.hireDate).format("DD-MMM-YYYY")}
+        </span>
+      ),
     },
     {
       name: "Created Date",
@@ -114,7 +148,7 @@ const BranchesTable = () => {
             size={18}
             onClick={(e) => {
               // router.push("/create");
-              selSelectedBranch(row);
+              setSelectedEmployee(row);
               setShowModal(true);
             }}
           />
@@ -132,23 +166,23 @@ const BranchesTable = () => {
   ];
   return (
     <>
-      <BranchesModal
+      <EmployeesModal
         showModal={showModal}
         setShowModal={setShowModal}
-        selectedRow={selectedBranch}
-        setSelectedRow={selSelectedBranch}
+        selectedRow={selectedEmployee}
+        setSelectedRow={setSelectedEmployee}
       />
       <Table
         columns={columns}
         onCreateAction={() => setShowModal(true)}
         populate={[]}
         query={{}}
-        title="Branches"
-        url={BranchesApi}
+        title="Employees"
+        url={EmployeesApi}
         searchFields={["name"]}
       />
     </>
   );
 };
 
-export default BranchesTable;
+export default EmployeesTable;
