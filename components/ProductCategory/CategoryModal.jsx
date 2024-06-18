@@ -54,7 +54,7 @@ const CategoryModal = ({
 
   const { mutate, isPending: isLoading } = useCreate(
     ProductCategoryApi,
-    "Category Created Successfully",
+    "Prooduct Category Created Successfully",
     () => {
       setShowModal(false);
     }
@@ -62,7 +62,7 @@ const CategoryModal = ({
 
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
     ProductCategoryApi,
-    "Category Updated Successfully",
+    "Prooduct Category Updated Successfully",
     () => {
       setShowModal(false);
       setSelectedRow(null);

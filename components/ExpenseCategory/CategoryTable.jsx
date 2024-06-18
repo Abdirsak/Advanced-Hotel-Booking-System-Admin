@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 
 //custom packages
 import Table from "common/Table";
-import { ProductCategoryApi } from "common/utils/axios/api";
+import { ExpenseCategoryApi } from "common/utils/axios/api";
 import CategoryModal from "./CategoryModal";
 import useDelete from "hooks/useDelete";
 
@@ -21,7 +21,7 @@ const CategoryTable = () => {
   const router = useRouter();
 
   //delete mutation
-  const { mutate, isPending: isLoading } = useDelete(ProductCategoryApi, false, () => {
+  const { mutate, isPending: isLoading } = useDelete(ExpenseCategoryApi, false, () => {
     //   setShowModal(false);
     //   setSelectedRow(null);
   });
@@ -122,8 +122,8 @@ const CategoryTable = () => {
         onCreateAction={() => setShowModal(true)}
         populate={[]}
         query={{}}
-        title="Categories"
-        url={ProductCategoryApi}
+        title="Expense Categories"
+        url={ExpenseCategoryApi}
         searchFields={["name"]}
       />
     </>

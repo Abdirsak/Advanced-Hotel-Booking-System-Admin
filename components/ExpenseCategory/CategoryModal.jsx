@@ -20,7 +20,7 @@ import {
 } from "reactstrap";
 
 //custom packages
-import { ProductCategoryApi } from "common/utils/axios/api";
+import { ExpenseCategoryApi } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
 import useUpdate from "Hooks/useUpdate";
 
@@ -53,16 +53,16 @@ const CategoryModal = ({
   } = useForm({ defaultValues, resolver: joiResolver(schema) });
 
   const { mutate, isPending: isLoading } = useCreate(
-    ProductCategoryApi,
-    "Category Created Successfully",
+    ExpenseCategoryApi,
+    "New Category Created Successfully",
     () => {
       setShowModal(false);
     }
   );
 
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
-    ProductCategoryApi,
-    "Category Updated Successfully",
+    ExpenseCategoryApi,
+    "New Category Updated Successfully",
     () => {
       setShowModal(false);
       setSelectedRow(null);

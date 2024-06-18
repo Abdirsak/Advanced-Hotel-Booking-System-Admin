@@ -9,19 +9,19 @@ import Swal from "sweetalert2";
 
 //custom packages
 import Table from "common/Table";
-import { ProductCategoryApi } from "common/utils/axios/api";
-import CategoryModal from "./CategoryModal";
+import { SuppliersApi } from "common/utils/axios/api";
+import SupplierModal from "./SupplierModal";
 import useDelete from "hooks/useDelete";
 
 //
 
 const CategoryTable = () => {
   const [showModal, setShowModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [SelectedSupplier, setSelectedSupplier] = useState(null);
   const router = useRouter();
 
   //delete mutation
-  const { mutate, isPending: isLoading } = useDelete(ProductCategoryApi, false, () => {
+  const { mutate, isPending: isLoading } = useDelete(SuppliersApi, false, () => {
     //   setShowModal(false);
     //   setSelectedRow(null);
   });
@@ -29,7 +29,7 @@ const CategoryTable = () => {
   //delete function
   const handleConfirmDelete = async (id, name) => {
     return Swal.fire({
-      title: `Delete Product Category ${name}?`,
+      title: `Delete Category ${name}?`,
       text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
@@ -52,16 +52,37 @@ const CategoryTable = () => {
     {
       name: "Name",
       sortable: true,
-      sortField: "name",
-      selector: (row) => row?.name ?? "",
-      cell: (row) => <div className="">{row?.name ?? ""}</div>,
+      sortField: "SupplierName",
+      selector: (row) => row?.SupplierName ?? "",
+      cell: (row) => <div className="">{row?.SupplierName ?? ""}</div>,
+    },
+    {
+      name: "Phone",
+      sortable: true,
+      sortField: "phone",
+      selector: (row) => row?.phone ?? "",
+      cell: (row) => <div className="">{row?.phone ?? ""}</div>,
+    },
+    {
+      name: "Address",
+      sortable: true,
+      sortField: "address",
+      selector: (row) => row?.address ?? "",
+      cell: (row) => <div className="">{row?.address ?? ""}</div>,
+    },
+    {
+      name: "Email",
+      sortable: true,
+      sortField: "email",
+      selector: (row) => row?.email ?? "",
+      cell: (row) => <div className="">{row?.email ?? ""}</div>,
     },
 
     {
       name: "Description",
       sortable: true,
       sortField: "description",
-      selector: (row) => row.description,
+      selector: (row) => row?.description,
       cell: (row) => <div className="">{row?.description ?? ""}</div>,
     },
     {
@@ -93,7 +114,7 @@ const CategoryTable = () => {
             size={18}
             onClick={(e) => {
               // router.push("/create");
-              setSelectedCategory(row);
+              setSelectedSupplier(row);
               setShowModal(true);
             }}
           />
@@ -111,19 +132,19 @@ const CategoryTable = () => {
   ];
   return (
     <>
-      <CategoryModal
+      <SupplierModal
         showModal={showModal}
         setShowModal={setShowModal}
-        selectedRow={selectedCategory}
-        setSelectedRow={setSelectedCategory}
+        selectedRow={SelectedSupplier}
+        setSelectedRow={setSelectedSupplier}
       />
       <Table
         columns={columns}
         onCreateAction={() => setShowModal(true)}
         populate={[]}
         query={{}}
-        title="Product Categories"
-        url={ProductCategoryApi}
+        title="Suppliers"
+        url={SuppliersApi}
         searchFields={["name"]}
       />
     </>
