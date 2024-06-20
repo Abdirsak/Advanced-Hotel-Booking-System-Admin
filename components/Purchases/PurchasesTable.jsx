@@ -1,27 +1,28 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { Button } from "reactstrap";
 //3rd party libraries
-import { Edit2, Trash2 } from "react-feather";
+import { Edit2, Trash2,Plus} from "react-feather";
+import Link from "next/link";
 import { Badge } from "reactstrap";
 import moment from "moment";
 import Swal from "sweetalert2";
 
 //custom packages
 import Table from "common/Table";
-import { EmployeesApi } from "common/utils/axios/api";
+import { PurchasesApi } from "common/utils/axios/api";
 import PurchasesModal from "./PurchasesModal";
 import useDelete from "hooks/useDelete";
 
 //
 
-const EmployeesTable = () => {
+const PurchasesTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const router = useRouter();
 
   //delete mutation
-  const { mutate, isPending: isLoading } = useDelete(EmployeesApi, false, () => {
+  const { mutate, isPending: isLoading } = useDelete(PurchasesApi, false, () => {
     //   setShowModal(false);
     //   setSelectedRow(null);
   });
@@ -48,107 +49,103 @@ const EmployeesTable = () => {
   };
 
   //columns
+
   const columns = [
     {
-      name: "Name",
+      name: "Product Name",
       sortable: true,
-      sortField: "name",
-      selector: (row) => row?.fullName ?? "",
-      cell: (row) => <div className="">{row?.fullName ?? ""}</div>,
-    },
-
-    {
-      name: "Gender",
-      sortable: true,
-      sortField: "gender",
-      selector: (row) => row.gender,
-      cell: (row) => <div className="">{row?.gender ?? ""}</div>,
+      sortField: "productsData.name",
+      selector: (row) => row.productsData.name,
+      cell: (row) => <div>{row.productsData.name}</div>,
     },
     {
-      name: "Contact",
+      name: "Supplier Name",
       sortable: true,
-      sortField: "contact",
-      selector: (row) => row.contact,
-      cell: (row) => <div className="">{row?.contact ?? ""}</div>,
+      sortField: "supplierData.SupplierName",
+      selector: (row) => row.supplierData.SupplierName,
+      cell: (row) => <div>{row.supplierData.SupplierName}</div>,
     },
     {
-      name: "Emergencey Contact",
+      name: "Reference",
       sortable: true,
-      sortField: "emergencyContact",
-      selector: (row) => row.emergencyContact,
-      cell: (row) => <div className="">{row?.emergencyContact ?? ""}</div>,
+      sortField: "reference",
+      selector: (row) => row.reference,
+      cell: (row) => <div>{row.reference}</div>,
     },
     {
-      name: "Address",
+      name: "Purchase Date",
       sortable: true,
-      sortField: "address",
-      selector: (row) => row.address,
-      cell: (row) => <div className="">{row?.address ?? ""}</div>,
+      sortField: "purchaseDate",
+      selector: (row) => row.purchaseDate,
+      cell: (row) => <div>{moment(row.purchaseDate).format("DD-MMM-YYYY")}</div>,
     },
     {
-      name: "Salary",
+      name: "Expected Date",
       sortable: true,
-      sortField: "salary",
-      selector: (row) => row.salary,
-      cell: (row) => <div className="">{row?.salary ?? ""}</div>,
+      sortField: "expectedDate",
+      selector: (row) => row.expectedDate,
+      cell: (row) => <div>{moment(row.expectedDate).format("DD-MMM-YYYY")}</div>,
     },
     {
-      name: "Department",
+      name: "Order Status",
       sortable: true,
-      sortField: "department",
-      selector: (row) => row?.department,
-      cell: (row) => <div className="">{row?.department ?? ""}</div>,
+      sortField: "orderStatus",
+      selector: (row) => row.orderStatus,
+      cell: (row) => <div>{row.orderStatus}</div>,
     },
     {
-      name: "Position",
+      name: "Payment Status",
       sortable: true,
-      sortField: "position",
-      selector: (row) => row?.position,
-      cell: (row) => <div className="">{row?.position ?? ""}</div>,
+      sortField: "paymentStatus",
+      selector: (row) => row.paymentStatus,
+      cell: (row) => <div>{row.paymentStatus}</div>,
+    },
+    {
+      name: "Billing Address",
+      sortable: true,
+      sortField: "billingAddress",
+      selector: (row) => row.billingAddress,
+      cell: (row) => <div>{row.billingAddress}</div>,
+    },
+    {
+      name: "Shipping Address",
+      sortable: true,
+      sortField: "shippingAddress",
+      selector: (row) => row.shippingAddress,
+      cell: (row) => <div>{row.shippingAddress}</div>,
+    },
+    {
+      name: "Total Amount",
+      sortable: true,
+      sortField: "totalAmount",
+      selector: (row) => row.totalAmount.$numberDecimal,
+      cell: (row) => <div>{row.totalAmount.$numberDecimal}</div>,
+    },
+    {
+      name: "Tax Information",
+      sortable: true,
+      sortField: "taxInformation",
+      selector: (row) => row.taxInformation,
+      cell: (row) => <div>{row.taxInformation}</div>,
+    },
+    {
+      name: "Invoice ID",
+      sortable: true,
+      sortField: "invoiceId",
+      selector: (row) => row.invoiceId,
+      cell: (row) => <div>{row.invoiceId || "N/A"}</div>,
     },
    
     {
-      name: "Hire Date",
-      sortable: true,
-      sortField: "hireDate",
-      selector: (row) => row.hireDate,
-      cell: (row) => (
-        <span className="text-capitalize">
-          {" "}
-          {moment(row.hireDate).format("DD-MMM-YYYY")}
-        </span>
-      ),
-    },
-    {
-      name: "Created Date",
-      sortable: true,
-      sortField: "createdAt",
-      selector: (row) => row.createdAt,
-      cell: (row) => (
-        <span className="text-capitalize">
-          {" "}
-          {moment(row.createdAt).format("DD-MMM-YYYY")}
-        </span>
-      ),
-    },
-
-    {
       name: "Actions",
       cell: (row) => (
-        <div
-          style={{
-            justifyContent: "space-between",
-            cursor: "pointer",
-          }}
-          className="column-action"
-        >
+        <div style={{ justifyContent: "space-between", cursor: "pointer" }} className="column-action">
           <Edit2
             style={{ marginRight: 10 }}
             color="MidnightBlue"
             size={18}
-            onClick={(e) => {
-              // router.push("/create");
-              setSelectedEmployee(row);
+            onClick={() => {
+              setSelectedPurchase(row);
               setShowModal(true);
             }}
           />
@@ -156,33 +153,39 @@ const EmployeesTable = () => {
             style={{ marginLeft: 10 }}
             color="red"
             size={18}
-            onClick={() => {
-              handleConfirmDelete(row._id, row.name);
-            }}
+            onClick={() => handleConfirmDelete(row._id, row.reference)}
           />
         </div>
       ),
     },
   ];
+
   return (
     <>
-      <PurchasesModal
+      <div>
+        <Button color="primary" className="px-4 justify-end text-white">
+          <Link href={"/purchases/new"} color="primary" className="px-4 text-white">
+            <Plus /> New Purchases
+          </Link>
+        </Button>
+      </div>
+      {/* <PurchasesModal
         showModal={showModal}
         setShowModal={setShowModal}
         selectedRow={selectedEmployee}
         setSelectedRow={setSelectedEmployee}
-      />
+      /> */}
       <Table
         columns={columns}
-        onCreateAction={() => setShowModal(true)}
+        // onCreateAction={() => setShowModal(true)}
         populate={[]}
         query={{}}
-        title="Employees"
-        url={EmployeesApi}
+        title="Purchases"
+        url={PurchasesApi}
         searchFields={["name"]}
       />
     </>
   );
 };
 
-export default EmployeesTable;
+export default PurchasesTable;

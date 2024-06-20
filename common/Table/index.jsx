@@ -92,9 +92,12 @@ const Table = ({
         <CardBody>
           <div className="d-flex justify-content-between">
             <h4>{title} Management</h4>
+            {onCreateAction && (
             <Button color="primary" className="px-4" onClick={onCreateAction}>
               <Plus /> New {title}
             </Button>
+
+            )}
           </div>
         </CardBody>
         <div className="react-dataTable">
