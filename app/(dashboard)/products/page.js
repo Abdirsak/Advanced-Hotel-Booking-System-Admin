@@ -1,8 +1,8 @@
-import Agent from "components/Product";
+import Products from "components/Product";
 import React from "react";
 
 const page = () => {
-  return <Agent />;
+  return <Products />;
 };
 
 export default page;
