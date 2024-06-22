@@ -27,9 +27,9 @@ const UsersTable = () => {
   });
 
   //delete function
-  const handleConfirmDelete = async (id, name) => {
+  const handleConfirmDelete = async (id, fullName) => {
     return Swal.fire({
-      title: `Delete User ${name}?`,
+      title: `Delete User ${fullName}?`,
       text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
@@ -59,19 +59,11 @@ const UsersTable = () => {
       cell: (row) => (
         <div className="d-flex align-items-center">
           <div className="ms-0">
-            <div className="fw-bold">{row?.name ?? ""}</div>
+            <div className="fw-bold">{row?.fullName ?? ""}</div>
             <div className="font-small-2 text-muted">{row?.email || ""}</div>
           </div>
         </div>
       ),
-    },
-
-    {
-      name: "phone",
-      sortable: true,
-      sortField: "phone",
-      selector: (row) => row?.phone ?? "",
-      cell: (row) => <div className="">{row?.phone ?? "-"}</div>,
     },
 
     {
@@ -107,6 +99,24 @@ const UsersTable = () => {
         </span>
       ),
     },
+    {
+      name: "createdBy",
+      sortable: true,
+      width: "20%",
+      sortField: "name",
+      selector: (row) => row?.createdBy ?? "",
+      cell: (row) => <div className="">{row?.createdBy ?? ""}</div>,
+      cell: (row) => (
+        <div className="d-flex align-items-center">
+          <div className="ms-0">
+            <div className="fw-bold">{row?.createdBy?.fullName ?? ""}</div>
+            <div className="font-small-2 text-muted">
+              {row?.createdBy?.email || ""}
+            </div>
+          </div>
+        </div>
+      ),
+    },
 
     {
       name: "Actions",
@@ -133,7 +143,7 @@ const UsersTable = () => {
             color="red"
             size={18}
             onClick={() => {
-              handleConfirmDelete(row._id, row.name);
+              handleConfirmDelete(row._id, row.fullName);
             }}
           />
         </div>
@@ -153,7 +163,7 @@ const UsersTable = () => {
         onCreateAction={() => setShowModal(true)}
         populate={[]}
         query={{}}
-        title="Categories"
+        title="User"
         url={UsersAPI}
         searchFields={["name"]}
       />

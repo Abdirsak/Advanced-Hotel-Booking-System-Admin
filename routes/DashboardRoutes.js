@@ -32,6 +32,12 @@ export const DashboardMenu = [
   },
   {
     id: uuid(),
+    title: "Login",
+    icon: "login",
+    link: "/login",
+  },
+  {
+    id: uuid(),
     title: "HRM",
     grouptitle: true,
   },
@@ -42,7 +48,12 @@ export const DashboardMenu = [
   { id: uuid(), link: "/payments", icon: "layout", title: "Payments" },
   { id: uuid(), link: "/receipts", icon: "layout", title: "Receipts" },
   { id: uuid(), link: "/expenses", icon: "layout", title: "Expenses" },
-  { id: uuid(), link: "/adjustments", icon: "layout", title: "Inventory Adjustments" },
+  {
+    id: uuid(),
+    link: "/adjustments",
+    icon: "layout",
+    title: "Inventory Adjustments",
+  },
   {
     id: uuid(),
     title: "Masters",
@@ -54,7 +65,7 @@ export const DashboardMenu = [
       { id: uuid(), link: "/customers", name: "Customers" },
       { id: uuid(), link: "/suppliers", name: "Suppliers" },
       { id: uuid(), link: "/expenseCategories", name: "Expense Category" },
-      { id: uuid(), link: "/productCategories", name: "Product Category" }
+      { id: uuid(), link: "/productCategories", name: "Product Category" },
     ],
   },
   {
@@ -71,7 +82,7 @@ export const DashboardMenu = [
       // { id: uuid(), link: "/productCategory", name: "Product Category" }
     ],
   },
- 
+
   // {
   //   id: uuid(),
   //   title: "PROPERTIES & CATEGORY",

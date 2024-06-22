@@ -26,24 +26,12 @@ import useUpdate from "Hooks/useUpdate";
 
 //validation schema
 const schema = Joi.object({
-  name: Joi.string().min(2).max(20).required().label("name"),
-  email: Joi.string().min(2).max(20).required().label("email"),
-  phone: Joi.string().min(2).max(20).required().label("phone"),
-  password: Joi.string().min(2).max(20).required().label("password"),
-
-  fcmToken: Joi.string().min(2).max(20).required().label("fcmToken"),
-  addressCountry: Joi.string()
-    .min(2)
-    .max(20)
-    .required()
-    .label("addressCountry"),
-  addressCity: Joi.string().min(2).max(20).required().label("addressCity"),
-  addressArea: Joi.string().min(2).max(20).required().label("addressArea"),
-  bio: Joi.string().min(2).max(20).required().label("bio"),
-  role: Joi.string().min(2).max(20).required().label("role"),
-  status: Joi.string().min(2).max(20).required().label("status"),
-  registerType: Joi.string().min(2).max(20).required().label("registerType"),
-  isOnline: Joi.boolean().label("isOnline"),
+  username: Joi.string().min(3).max(50).required().label("username"),
+  password: Joi.string().min(2).max(1000),
+  fullName: Joi.string().min(2).max(50).required().label("fullName"),
+  role: Joi.string().min(2).max(50).required().label("role"),
+  departmentId: Joi.string().required().label("departmentId"),
+  status: Joi.string().min(2).max(50).required().label("status"),
 });
 
 //component
@@ -54,20 +42,12 @@ const UsersModal = ({
   setSelectedRow,
 }) => {
   const defaultValues = {
-    name: selectedRow?.name || "",
-    email: selectedRow?.email || "",
-    phone: selectedRow?.phone || "",
+    username: selectedRow?.username || "",
     password: selectedRow?.password || "",
-
-    fcmToken: selectedRow?.fcmToken || "",
-    addressCountry: selectedRow?.addressCountry || "",
-    addressCity: selectedRow?.addressCity || "",
-    addressArea: selectedRow?.addressArea || "",
-    bio: selectedRow?.bio || "",
+    fullName: selectedRow?.fullName || "",
     role: selectedRow?.role || "",
-    status: selectedRow?.status || "active",
-    registerType: selectedRow?.registerType || "",
-    isOnline: selectedRow?.isOnline || "",
+    departmentId: selectedRow?.departmentId || "",
+    status: selectedRow?.status || "Active",
   };
 
   const {
@@ -97,8 +77,11 @@ const UsersModal = ({
     }
   );
 
+  console.log("selected row :", selectedRow);
+
   const onSubmit = (data) => {
     if (selectedRow) {
+      console.log("submitted Data :", data);
       mutateUpdate({ data, updateId: selectedRow?._id });
     } else {
       mutate(data);
@@ -120,20 +103,12 @@ const UsersModal = ({
     if (selectedRow) {
       reset({
         ...defaultValues,
-        name: selectedRow?.name || "",
-        email: selectedRow?.email || "",
-        phone: selectedRow?.phone || "",
+        username: selectedRow?.username || "",
         password: selectedRow?.password || "",
-
-        fcmToken: selectedRow?.fcmToken || "",
-        addressCountry: selectedRow?.addressCountry || "",
-        addressCity: selectedRow?.addressCity || "",
-        addressArea: selectedRow?.addressArea || "",
-        bio: selectedRow?.bio || "",
-        role: selectedRow?.role || "admin",
-        status: selectedRow?.status || "active",
-        registerType: selectedRow?.registerType || "",
-        isOnline: selectedRow?.isOnline || "",
+        fullName: selectedRow?.fullName || "",
+        departmentId: selectedRow?.departmentId || "",
+        role: selectedRow?.role || "Admin",
+        status: selectedRow?.status || "Active",
       });
     }
   }, [selectedRow]);
@@ -154,235 +129,79 @@ const UsersModal = ({
             <Row className="justify-content-center">
               <Col xs={12} className="mb-2">
                 <Label className="form-label" for="name">
-                  Name
+                  User Name
                 </Label>
                 <Controller
-                  name="name"
+                  name="username"
                   control={control}
                   render={({ field }) => (
                     <Input
-                      id="name"
-                      placeholder="name"
+                      id="username"
+                      placeholder="User Name"
                       {...register(
-                        "name",
+                        "username",
                         { required: true },
-                        "name is required"
+                        "username is required"
                       )}
-                      invalid={errors.name && true}
+                      invalid={errors.username && true}
                       {...field}
                     />
                   )}
                 />
-                {errors.name && (
-                  <FormFeedback>{errors.name.message}</FormFeedback>
+                {errors.username && (
+                  <FormFeedback>{errors.username.message}</FormFeedback>
                 )}
               </Col>
-
+              {selectedRow === null && (
+                <Col xs={12} className="mb-2">
+                  <Label className="form-label" for="password">
+                    password
+                  </Label>
+                  <Controller
+                    name="password"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        id="password"
+                        placeholder="password"
+                        {...register(
+                          "password",
+                          { required: true },
+                          "password is required"
+                        )}
+                        invalid={errors.password && true}
+                        {...field}
+                      />
+                    )}
+                  />
+                  {errors.password && (
+                    <FormFeedback>{errors.password.message}</FormFeedback>
+                  )}
+                </Col>
+              )}
               <Col xs={12} className="mb-2">
-                <Label className="form-label" for="email">
-                  Email
+                <Label className="form-label" for="name">
+                  Full Name
                 </Label>
                 <Controller
-                  name="email"
+                  name="fullName"
                   control={control}
                   render={({ field }) => (
                     <Input
-                      id="email"
-                      placeholder="email"
+                      id="fullName"
+                      placeholder="Full Name"
                       {...register(
-                        "email",
+                        "fullName",
                         { required: true },
-                        "email is required"
+                        "fullName is required"
                       )}
-                      invalid={errors.email && true}
+                      invalid={errors.fullName && true}
                       {...field}
                     />
                   )}
                 />
-                {errors.email && (
-                  <FormFeedback>{errors.email.message}</FormFeedback>
-                )}
-              </Col>
-
-              <Col xs={12} className="mb-2">
-                <Label className="form-label" for="phone">
-                  phone
-                </Label>
-                <Controller
-                  name="phone"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="phone"
-                      placeholder="phone"
-                      {...register(
-                        "phone",
-                        { required: true },
-                        "phone is required"
-                      )}
-                      invalid={errors.phone && true}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.phone && (
-                  <FormFeedback>{errors.phone.message}</FormFeedback>
-                )}
-              </Col>
-
-              <Col xs={12} className="mb-2">
-                <Label className="form-label" for="password">
-                  password
-                </Label>
-                <Controller
-                  name="password"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="password"
-                      placeholder="password"
-                      {...register(
-                        "password",
-                        { required: true },
-                        "password is required"
-                      )}
-                      invalid={errors.password && true}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.password && (
-                  <FormFeedback>{errors.password.message}</FormFeedback>
-                )}
-              </Col>
-
-              <Col xs={12} className="mb-2">
-                <Label className="form-label" for="fcmToken">
-                  fcmToken
-                </Label>
-                <Controller
-                  name="fcmToken"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="fcmToken"
-                      placeholder="fcmToken"
-                      {...register(
-                        "fcmToken",
-                        { required: true },
-                        "fcmToken is required"
-                      )}
-                      invalid={errors.fcmToken && true}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.fcmToken && (
-                  <FormFeedback>{errors.fcmToken.message}</FormFeedback>
-                )}
-              </Col>
-
-              <Col xs={12} className="mb-2">
-                <Label className="form-label" for="addressCountry">
-                  addressCountry
-                </Label>
-                <Controller
-                  name="addressCountry"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="addressCountry"
-                      placeholder="addressCountry"
-                      {...register(
-                        "addressCountry",
-                        { required: true },
-                        "addressCountry is required"
-                      )}
-                      invalid={errors.name && true}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.addressCountry && (
-                  <FormFeedback>{errors.addressCountry.message}</FormFeedback>
-                )}
-              </Col>
-
-              <Col xs={12} className="mb-2">
-                <Label className="form-label" for="addressCity">
-                  addressCity
-                </Label>
-                <Controller
-                  name="addressCity"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="addressCity"
-                      placeholder="addressCity"
-                      {...register(
-                        "addressCity",
-                        { required: true },
-                        "addressCity is required"
-                      )}
-                      invalid={errors.addressCity && true}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.addressCity && (
-                  <FormFeedback>{errors.addressCity.message}</FormFeedback>
-                )}
-              </Col>
-
-              <Col xs={12} className="mb-2">
-                <Label className="form-label" for="addressArea">
-                  addressArea
-                </Label>
-                <Controller
-                  name="addressArea"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="addressArea"
-                      placeholder="addressArea"
-                      {...register(
-                        "addressArea",
-                        { required: true },
-                        "addressArea is required"
-                      )}
-                      invalid={errors.addressArea && true}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.addressArea && (
-                  <FormFeedback>{errors.addressArea.message}</FormFeedback>
-                )}
-              </Col>
-
-              <Col xs={12} className="mb-2">
-                <Label className="form-label" for="bio">
-                  bio
-                </Label>
-                <Controller
-                  name="bio"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="bio"
-                      placeholder="bio"
-                      {...register(
-                        "bio",
-                        { required: true },
-                        "bio is required"
-                      )}
-                      invalid={errors.name && true}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.bio && (
-                  <FormFeedback>{errors.bio.message}</FormFeedback>
+                {errors.fullName && (
+                  <FormFeedback>{errors.fullName.message}</FormFeedback>
                 )}
               </Col>
               <Col xs={12} className="mb-2">
@@ -405,8 +224,43 @@ const UsersModal = ({
                       invalid={errors.role && true}
                       {...field}
                     >
-                      <option value="admin">Admin</option>
-                      <option value="teacher">User</option>
+                      <option value="Admin">Admin</option>
+                      <option value="user">User</option>
+                    </Input>
+                  )}
+                />
+                {errors.role && (
+                  <FormFeedback>{errors.role.message}</FormFeedback>
+                )}
+              </Col>
+              <Col xs={12} className="mb-2">
+                <Label className="form-label" for="role">
+                  Department
+                </Label>
+                <Controller
+                  name="departmentId"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="departmentId"
+                      type="select"
+                      placeholder="Department"
+                      {...register(
+                        "departmentId",
+                        { required: true },
+                        "Department is required"
+                      )}
+                      invalid={errors.departmentId && true}
+                      {...field}
+                    >
+                      <option value="666460b1b5d4a06682376000">
+                        Main Department
+                      </option>
+                      <option value="66698cc4fb412e674ef092bf">Second</option>
+                      <option value="666460b1b5d4a06682376000">Nasteexo</option>
+                      <option value="666460b1b5d4a06682376000">
+                        Xawo Taako
+                      </option>
                     </Input>
                   )}
                 />
@@ -435,65 +289,13 @@ const UsersModal = ({
                       invalid={errors.status && true}
                       {...field}
                     >
-                      <option value="active">Active</option>
-                      <option value="inactive">InActive</option>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">InActive</option>
                     </Input>
                   )}
                 />
                 {errors.status && (
                   <FormFeedback>{errors.status.message}</FormFeedback>
-                )}
-              </Col>
-
-              <Col xs={12} className="mb-2">
-                <Label className="form-label" for="registerType">
-                  registerType
-                </Label>
-                <Controller
-                  name="registerType"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="registerType"
-                      placeholder="registerType"
-                      {...register(
-                        "registerType",
-                        { required: true },
-                        "registerType is required"
-                      )}
-                      invalid={errors.registerType && true}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.registerType && (
-                  <FormFeedback>{errors.registerType.message}</FormFeedback>
-                )}
-              </Col>
-
-              <Col xs={12} className="mb-2">
-                <Label className="form-label" for="isOnline">
-                  isOnline
-                </Label>
-                <Controller
-                  name="isOnline"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="isOnline"
-                      placeholder="isOnline"
-                      {...register(
-                        "isOnline",
-                        { required: true },
-                        "isOnline is required"
-                      )}
-                      invalid={errors.isOnline && true}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.isOnline && (
-                  <FormFeedback>{errors.isOnline.message}</FormFeedback>
                 )}
               </Col>
             </Row>
