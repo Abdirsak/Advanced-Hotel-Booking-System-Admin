@@ -13,3 +13,4 @@ export const InvoicesApi = "/invoices";
 export const PaymentsApi = "/payments";
 export const ReceiptsApi = "/receipts";
 export const InventoryAdjustments = "/inventoryAdjustments";
+export const CategoryAPI = "/productCategories";

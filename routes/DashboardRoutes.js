@@ -41,6 +41,7 @@ export const DashboardMenu = [
     title: "HRM",
     grouptitle: true,
   },
+  { id: uuid(), link: "/categories", icon: "layout", title: "categories" },
   { id: uuid(), link: "/products", icon: "layout", title: "Products" },
   { id: uuid(), link: "/purchases", icon: "layout", title: "Purchases" },
   { id: uuid(), link: "/sales", icon: "layout", title: "Sales" },

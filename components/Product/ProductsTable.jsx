@@ -12,10 +12,14 @@ import { ProductsApi } from "common/utils/axios/api";
 
 import ProductsModal from "./ProductsModal";
 import useDelete from "hooks/useDelete";
+import { useRouter } from "next/navigation";
 
 const ProductsTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [SelectedAgent, setSelectedAgent] = useState(null);
+
+  const router = useRouter();
+
   // delete mutation
   const { mutate, isPending: isLoading } = useDelete(ProductsApi, false, () => {
     // setShowModal(false);
@@ -67,7 +71,9 @@ const ProductsTable = () => {
       sortable: true,
       sortField: "supplier.SupplierName",
       selector: (row) => row?.supplier?.SupplierName ?? "",
-      cell: (row) => <div className="">{row?.supplier?.SupplierName ?? ""}</div>,
+      cell: (row) => (
+        <div className="">{row?.supplier?.SupplierName ?? ""}</div>
+      ),
     },
     {
       name: "Brand",
@@ -92,7 +98,7 @@ const ProductsTable = () => {
       sortable: true,
       sortField: "quantity",
       selector: (row) => row?.quantity ?? "",
-      cell: (row) => <div className="">{row?.quantity?? ""}</div>,
+      cell: (row) => <div className="">{row?.quantity ?? ""}</div>,
     },
     {
       name: "Price",
@@ -160,13 +166,13 @@ const ProductsTable = () => {
 
   return (
     <>
-      <div>
+      {/* <div>
         <Button color="primary" className="px-4 justify-end text-white">
           <Link href={"/products/Register"} color="primary" className="px-4 text-white">
             <Plus /> New Products
           </Link>
         </Button>
-      </div>
+      </div> */}
 
       <Table
         columns={columns}
@@ -174,6 +180,7 @@ const ProductsTable = () => {
         query={{}}
         title="Products"
         url={ProductsApi}
+        onCreateAction={() => router.push("/products/Register")}
       />
     </>
   );
