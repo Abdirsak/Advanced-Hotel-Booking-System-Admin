@@ -111,7 +111,7 @@ const UsersTable = () => {
           <div className="ms-0">
             <div className="fw-bold">{row?.createdBy?.fullName ?? ""}</div>
             <div className="font-small-2 text-muted">
-              {row?.createdBy?.email || ""}
+              {row?.createdBy?.username || ""}
             </div>
           </div>
         </div>

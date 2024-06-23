@@ -1,8 +1,10 @@
 import axios from "axios";
+import { getCookie } from "cookies-next";
 
 const client = axios.create({
   baseURL: process.env.NEXT_PUBLIC_ENDPOINT,
   headers: {
+    Authorization: `Bearer ${getCookie("token")}`,
     Accept: "application/json",
   },
 });
