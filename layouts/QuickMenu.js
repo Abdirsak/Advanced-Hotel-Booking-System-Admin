@@ -17,6 +17,7 @@ import NotificationList from "data/Notification";
 import useMounted from "hooks/useMounted";
 import { logOut } from "redux/auth/authSlice";
 import { useRouter } from "next/navigation";
+import { deleteCookie } from "cookies-next";
 
 const QuickMenu = () => {
   const hasMounted = useMounted();
@@ -26,12 +27,14 @@ const QuickMenu = () => {
 
   const logout = async () => {
     dispatch(logOut());
+    deleteCookie("token", { path: "/" });
     router.replace("/auth/login");
+    window.location.reload(); // Force page reload after logout
   };
 
   useEffect(() => {
     router.prefetch("/auth/login");
-  }, []);
+  }, [router]);
 
   const isDesktop = useMediaQuery({
     query: "(min-width: 1224px)",

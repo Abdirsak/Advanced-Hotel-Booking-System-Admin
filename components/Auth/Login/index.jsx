@@ -16,12 +16,10 @@ import toast from "react-hot-toast";
 
 import { useLoginMutation } from "redux/auth/authApi";
 import { setCredential } from "redux/auth/authSlice";
+import { setCookie } from "cookies-next";
 
 const schema = Joi.object({
-  email: Joi.string()
-    // .email({ tlds: { allow: false } })
-    .required()
-    .label("Email"),
+  username: Joi.string().required().label("Username"),
   password: Joi.string().label("Password"),
 });
 
@@ -38,7 +36,7 @@ const LoginPage = () => {
     reset,
     formState: { errors },
   } = useForm({
-    defaultValues: { email: "", password: "" },
+    defaultValues: { username: "", password: "" },
     resolver: joiResolver(schema),
   });
 
@@ -47,7 +45,9 @@ const LoginPage = () => {
       const res = await login(data).unwrap();
       if (res.status) {
         dispatch(setCredential({ res: res?.data, router }));
+        setCookie("token", res.token, { path: "/" });
         toast.success(res.message);
+        window.location.href = "/dashboard"; // Force page reload after successful login
       } else {
         toast.error(res.message);
       }
@@ -60,8 +60,8 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    router.prefetch("/");
-  }, []);
+    router.prefetch("/dashboard");
+  }, [router]);
 
   return (
     <Row className="align-items-center justify-content-center g-0 min-vh-100">
@@ -78,29 +78,29 @@ const LoginPage = () => {
                   alt=""
                 />
               </Link>
-              <p className="mb-6">Please enter your user information.</p>
+              <p className="mb-6">Please login to access the system.</p>
             </div>
             {/* Form */}
             <Form onSubmit={handleSubmit(onSubmit)}>
               {/* Username */}
-              <Form.Group className="mb-3" controlId="email">
-                <Form.Label>Email</Form.Label>
+              <Form.Group className="mb-3" controlId="username">
+                <Form.Label>Username</Form.Label>
 
                 <Controller
-                  name="email"
+                  name="username"
                   control={control}
                   render={({ field }) => (
                     <Input
                       type="text"
-                      placeholder="Enter address here"
-                      {...register("email", { required: true })}
-                      invalid={errors.email && true}
+                      placeholder="Enter Username address here"
+                      {...register("username", { required: true })}
+                      invalid={errors.username && true}
                       {...field}
                     />
                   )}
                 />
-                {errors.email && (
-                  <FormFeedback>{errors.email.message}</FormFeedback>
+                {errors.username && (
+                  <FormFeedback>{errors.username.message}</FormFeedback>
                 )}
               </Form.Group>
 

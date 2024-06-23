@@ -28,7 +28,7 @@ export const DashboardMenu = [
     id: uuid(),
     title: "Dashboard",
     icon: "home",
-    link: "/",
+    link: "/dashboard",
   },
   {
     id: uuid(),
@@ -62,7 +62,7 @@ export const DashboardMenu = [
     children: [
       { id: uuid(), link: "/employees", name: "Employees" },
       { id: uuid(), link: "/branches", name: "Branches" },
-      { id: uuid(), link: "/users", name: "Users" },
+      { id: uuid(), link: "dashboard/users", name: "Users" },
       { id: uuid(), link: "/customers", name: "Customers" },
       { id: uuid(), link: "/suppliers", name: "Suppliers" },
       { id: uuid(), link: "/expenseCategories", name: "Expense Category" },
