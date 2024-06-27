@@ -11,7 +11,8 @@ import useCreate from "Hooks/useCreate";
 import useUpdate from "Hooks/useUpdate";
 import { useQuery } from "@tanstack/react-query";
 import request from "common/utils/axios/index";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // Fetch Customers
 const fetchCustomers = async () => {
   const response = await request({
@@ -45,25 +46,28 @@ const useProducts = () => {
 };
 
 const schema = Joi.object({
-  customerId: Joi.string().required().label("Customer"),
+  customer: Joi.string().required().label("Customer"),
   saleDate: Joi.date().required().label("Sale Date"),
   totalAmount: Joi.number().required().label("Total Amount"),
   discount: Joi.number().optional().allow(0).label("Discount"),
+  paidBalance: Joi.number().optional().allow(0).label("Paid Balance"),
   status: Joi.string().valid("completed", "pending", "cancelled").required().label("Status"),
-  items: Joi.array().items(
+  salesItems: Joi.array().items(
     Joi.object({
       productId: Joi.string().required().label("Product"),
       quantity: Joi.number().required().label("Quantity"),
       price: Joi.number().required().label("Price"),
       total: Joi.number().required().label("Total"),
+      quantityAvailable: Joi.number().required().label("Available Quantity"),
     })
-  ).required().label("Items")
+  ).required().label("salesItems")
 });
 
-const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }) => {
+const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelectedRow }) => {
   const [formData, setFormData] = useState({
-    customerId: "", saleDate: "", totalAmount: 0, discount: 0, status: "pending",
-    items: [{ productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }]
+    customer: "", saleDate: "", totalAmount: 0, discount: 0, status: "pending",
+    paidBalance:0,
+    salesItems: [{ productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }]
   });
   const [errors, setErrors] = useState({});
   const { data: customersData } = useCustomers();
@@ -90,34 +94,37 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
   const handleItemChange = (index, productId) => {
     const selectedItem = productsData?.data?.docs?.find(item => item._id === productId);
     if (selectedItem) {
-        console.log(selectedItem.price.$numberDecimal)
-      const updatedItems = [...formData.items];
-      updatedItems[index] = {
-        ...updatedItems[index],
+      const updatedsalesItems = [...formData.salesItems];
+      updatedsalesItems[index] = {
+        ...updatedsalesItems[index],
         productId: selectedItem._id,
-        price:  selectedItem.price.$numberDecimal,
+        price: selectedItem.price.$numberDecimal,
         quantityAvailable: selectedItem.quantity,
-        total: updatedItems[index].quantity * selectedItem.price
+        total: updatedsalesItems[index].quantity * selectedItem.price
       };
-      setFormData({ ...formData, items: updatedItems });
+      setFormData({ ...formData, salesItems: updatedsalesItems });
     }
   };
 
   const handleQuantityChange = (index, quantity) => {
-    const updatedItems = [...formData.items];
-    const item = updatedItems[index];
+  
+    const updatedsalesItems = [...formData.salesItems];
+    const item = updatedsalesItems[index];
     const total = parseFloat(quantity) * parseFloat(item.price || 0);
-    updatedItems[index] = { ...item, quantity, total };
-    setFormData({ ...formData, items: updatedItems });
+    updatedsalesItems[index] = { ...item, quantity, total };
+    setFormData({ ...formData, salesItems: updatedsalesItems });
+    if(quantity > formData.salesItems[0].quantityAvailable ){
+      return toast.error("Quantity can not be greater than Available Quantity")
+     }
   };
 
   useEffect(() => {
     let totalAmount = 0;
-    formData?.items?.forEach(item => {
+    formData?.salesItems?.forEach(item => {
       totalAmount += parseFloat(item.total) || 0;
     });
     setFormData({ ...formData, totalAmount });
-  }, [formData.items]);
+  }, [formData.salesItems]);
 
   useEffect(() => {
     if (selectedRow) {
@@ -138,8 +145,16 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(formData)
+    // console.log(formData.totalAmount - formData.paidBalance - formData.discount)
+    // return 
+    // if(formData.paidBalance == 0 )
+    if(formData.totalAmount <= 0){
+      return toast.error("Discount cannot exceed total amount")
+    }
     const newErrors = validate();
     setErrors(newErrors || {});
+    console.log(newErrors)
     if (newErrors) return;
     if (selectedRow) {
       mutateUpdate({ id: selectedRow._id, ...formData });
@@ -150,8 +165,8 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
 
   const onDiscard = () => {
     setFormData({
-      customerId: "", saleDate: "", totalAmount: 0, discount: 0, status: "pending",
-      items: [{ productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }]
+      customer: "", saleDate: "", totalAmount: 0, discount: 0, status: "pending",
+      salesItems: [{ productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }]
     });
     setErrors({});
     setShowModal(false);
@@ -159,20 +174,21 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
 
   return (
     <Fragment>
+       <ToastContainer />
       <Container>
         <Form onSubmit={handleSubmit} className="m-5 shadow-lg p-2">
           <Row className="justify-content-center">
             <Col md={4} lg={4} sm={12} className="mb-2">
-              <Label className="form-label" for="customerId">Customer</Label>
+              <Label className="form-label" for="customer">Customer</Label>
               <Select
-                id="customerId"
-                name="customerId"
+                id="customer"
+                name="customer"
                 options={customersOptions}
-                value={customersOptions?.find(option => option.value === formData.customerId)}
-                onChange={(selected) => setFormData({ ...formData, customerId: selected.value })}
-                isInvalid={!!errors.customerId}
+                value={customersOptions?.find(option => option.value === formData.customer)}
+                onChange={(selected) => setFormData({ ...formData, customer: selected.value })}
+                isInvalid={!!errors.customer}
               />
-              {errors.customerId && <FormFeedback>{errors.customerId}</FormFeedback>}
+              {errors.customer && <FormFeedback>{errors.customer}</FormFeedback>}
             </Col>
             <Col md={4} lg={4} sm={12} className="mb-2">
               <Label className="form-label" for="saleDate">Sale Date</Label>
@@ -215,12 +231,11 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
               </tr>
             </thead>
             <tbody>
-              {formData?.items?.map((item, index) => (
-                
+              {formData?.salesItems?.map((item, index) => (
                 <tr key={index}>
                   <td style={{ width: "250px" }}>
                     <Select
-                      name={`items[${index}].productId`}
+                      name={`salesItems[${index}].productId`}
                       options={productsOptions}
                       value={productsOptions?.find(option => option.value === item.productId)}
                       onChange={(selected) => handleItemChange(index, selected.value)}
@@ -229,15 +244,15 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
                   <td>
                     <Input
                       type="number"
-                      name={`items[${index}].quantityAvailable `}
-                      value={item.quantityAvailable }
+                      name={`salesItems[${index}].quantityAvailable `}
+                      value={item.quantityAvailable}
                       disabled
                     />
                   </td>
                   <td>
                     <Input
                       type="number"
-                      name={`items[${index}].quantity`}
+                      name={`salesItems[${index}].quantity`}
                       value={item.quantity}
                       onChange={(e) => handleQuantityChange(index, e.target.value)}
                       onBlur={(e) => handleQuantityChange(index, e.target.value)}
@@ -246,7 +261,7 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
                   <td>
                     <Input
                       type="number"
-                      name={`items[${index}].price`}
+                      name={`salesItems[${index}].price`}
                       value={item.price}
                       disabled
                     />
@@ -254,15 +269,15 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
                   <td>
                     <Input
                       type="number"
-                      name={`items[${index}].total`}
+                      name={`salesItems[${index}].total`}
                       value={item.total}
                       disabled
                     />
                   </td>
                   <td>
                     <Button color="danger" onClick={() => {
-                      const updatedItems = formData.items.filter((_, i) => i !== index);
-                      setFormData({ ...formData, items: updatedItems });
+                      const updatedsalesItems = formData.salesItems.filter((_, i) => i !== index);
+                      setFormData({ ...formData, salesItems: updatedsalesItems });
                     }}>
                       Remove
                     </Button>
@@ -274,7 +289,7 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
                 <td className="px-4">
                   <Button
                     color="success"
-                    onClick={() => setFormData({ ...formData, items: [...formData.items, { productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }] })}
+                    onClick={() => setFormData({ ...formData, salesItems: [...formData.salesItems, { productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }] })}
                   >
                     Add Item
                   </Button>
@@ -293,6 +308,47 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
                 invalid={!!errors.totalAmount}
               />
               {errors.totalAmount && <FormFeedback>{errors.totalAmount}</FormFeedback>}
+            </Col>
+          </Row>
+          {/* Receipt Details Section */}
+          <Row>
+            <h5 className="mt-4">Receipt Details</h5>
+            <Col md={3}>
+              <Label for="grandTotal">Grand Total</Label>
+              <Input
+                type="number"
+                name="grandTotal"
+                value={formData.totalAmount}
+                disabled
+              />
+            </Col>
+            <Col md={3}>
+              <Label for="discount">Discount</Label>
+              <Input
+                type="number"
+                name="discount"
+                value={formData.discount}
+                onChange={handleInputChange}
+              />
+            </Col>
+            <Col md={3}>
+              <Label for="paidBalance">Paid Balance</Label>
+              <Input
+                type="number"
+                name="paidBalance"
+                placeholder="Enter Paid Balance"
+                value={formData.paidBalance }
+                onChange={handleInputChange}
+              />
+            </Col>
+            <Col md={3}>
+              <Label for="balance">Balance</Label>
+              <Input
+                type="number"
+                name="balance"
+                value={(formData.totalAmount - (formData.discount || 0) - (formData.paidBalance || 0)).toFixed(2)}
+                disabled
+              />
             </Col>
           </Row>
           <Row>
@@ -323,4 +379,5 @@ const SalesFormModal = ({ showModal, setShowModal, selectedRow, setSelectedRow }
   );
 };
 
-export default SalesFormModal;
+export default SalesFormRegistration;
+

@@ -16,7 +16,7 @@ import useDelete from "hooks/useDelete";
 
 //
 
-const PurchasesTable = () => {
+const SalesTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [SelectedSales, setSelectedSales] = useState(null);
 
@@ -53,15 +53,19 @@ const PurchasesTable = () => {
 
   const columns = [
     {
-      name: "Discount",
+      name: "Customer",
       sortable: true,
-      sortField: "discount",
-      selector: (row) => row.discount.$numberDecimal,
-      cell: (row) => <div>{row.discount.$numberDecimal}</div>,
+      sortField: "customersData.fullName",
+      selector: (row) => row?.customersData?.fullName,
+      cell: (row) => <div>{row?.customersData?.fullName}</div>,
     },
-    
-    
-   
+    {
+      name: "Gender",
+      sortable: true,
+      sortField: "customersData?.gender",
+      selector: (row) => row?.customersData?.gender,
+      cell: (row) => <div>{row?.customersData?.gender}</div>,
+    },
     {
       name: "Sales Date",
       sortable: true,
@@ -69,6 +73,66 @@ const PurchasesTable = () => {
       selector: (row) => row.salesDate,
       cell: (row) => <div>{moment(row.salesDate).format("DD-MMM-YYYY")}</div>,
     },
+    {
+      name: "Product",
+      sortable: true,
+      sortField: "productsData?.name",
+      selector: (row) => row?.productsData?.name,
+      cell: (row) => <div>{row?.productsData?.name}</div>,
+    },
+    {
+      name: "Quantity",
+      sortable: true,
+      sortField: "salesItems?.quantity",
+      selector: (row) => row?.salesItems?.quantity,
+      cell: (row) => <div>{row?.salesItems?.quantity}</div>,
+    },
+    {
+      name: "Status",
+      sortable: true,
+      sortField: "status",
+      selector: (row) => row?.status,
+      cell: (row) => <div>{row?.status}</div>,
+    },
+    {
+      name: "Price",
+      sortable: true,
+      sortField: "salesItems?.price",
+      selector: (row) => row?.salesItems?.price.$numberDecimal,
+      cell: (row) => <div>{row?.salesItems?.price.$numberDecimal}</div>,
+    },
+    {
+      name: "Amount",
+      sortable: true,
+      sortField: "salesItems?.total",
+      selector: (row) => row?.salesItems?.total.$numberDecimal,
+      cell: (row) => <div>{row?.salesItems?.total.$numberDecimal}</div>,
+    },
+    {
+      name: "Paid",
+      sortable: true,
+      sortField: "totalAmount",
+      selector: (row) => row?.totalAmount.$numberDecimal,
+      cell: (row) => <div>{row?.totalAmount.$numberDecimal}</div>,
+    },
+    {
+      name: "Discount",
+      sortable: true,
+      sortField: "discount",
+      selector: (row) => row?.discount.$numberDecimal,
+      cell: (row) => <div>{row?.discount.$numberDecimal}</div>,
+    },
+    {
+      name: "Balance",
+      sortable: true,
+      sortField: "balance",
+      selector: (row) => row?.balance.$numberDecimal ?? 0,
+      cell: (row) => <div>{row?.balance.$numberDecimal ?? 0}</div>,
+    },
+    
+    
+   
+
     
     {
       name: "Actions",
@@ -82,9 +146,12 @@ const PurchasesTable = () => {
             color="MidnightBlue"
             size={18}
             onClick={() => {
-              setSelectedSales(row);
-              setShowModal(true);
+              router.push(`/dashboard/sales/update/${row._id}`);
             }}
+            // onClick={() => {
+            //   setSelectedSales(row);
+            //   setShowModal(true);
+            // }}
           />
           <Trash2
             style={{ marginLeft: 10 }}
@@ -99,22 +166,22 @@ const PurchasesTable = () => {
 
   return (
     <>
-      {/* <div>
+      <div>
         <Button color="primary" className="px-4 justify-end text-white">
-          <Link href={"/purchases/new"} color="primary" className="px-4 text-white">
-            <Plus /> New Purchases
+          <Link href={"/dashboard/sales/new"} color="primary" className="px-4 text-white">
+            <Plus /> New Sales
           </Link>
         </Button>
-      </div> */}
-      <SalesModal
+      </div>
+      {/* <SalesModal
         showModal={showModal}
         setShowModal={setShowModal}
         selectedRow={SelectedSales}
         setSelectedRow={setSelectedSales}
-      />
+      /> */}
       <Table
         columns={columns}
-        onCreateAction={() => setShowModal(true)}
+        // onCreateAction={() => setShowModal(true)}
         populate={[]}
         query={{}}
         title="Sales"
@@ -125,4 +192,4 @@ const PurchasesTable = () => {
   );
 };
 
-export default PurchasesTable;
+export default SalesTable;
