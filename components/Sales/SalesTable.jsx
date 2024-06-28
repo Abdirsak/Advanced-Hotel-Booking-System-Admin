@@ -11,7 +11,6 @@ import Swal from "sweetalert2";
 //custom packages
 import Table from "common/Table";
 import { SalesApi } from "common/utils/axios/api";
-import SalesModal from "./SalesModal";
 import useDelete from "hooks/useDelete";
 
 //
@@ -146,7 +145,7 @@ const SalesTable = () => {
             color="MidnightBlue"
             size={18}
             onClick={() => {
-              router.push(`/dashboard/sales/update/${row._id}`);
+              router.push(`/dashboard/sales/edit/${row._id}`);
             }}
             // onClick={() => {
             //   setSelectedSales(row);
@@ -181,7 +180,7 @@ const SalesTable = () => {
       /> */}
       <Table
         columns={columns}
-        // onCreateAction={() => setShowModal(true)}
+        // onCreateAction={() =>router.push("/dashboard/products/new")} 
         populate={[]}
         query={{}}
         title="Sales"
