@@ -1,28 +1,47 @@
 import { NextResponse } from "next/server";
 
-const cookieName = "rs-account";
+const parseCookies = (cookieHeader) => {
+  if (!cookieHeader) return {};
 
-export async function middleware(request) {
-  const cookie = request.cookies.get(cookieName);
-  const account = cookie ? cookie.value : null;
-  const path = request.nextUrl.pathname;
+  return Object.fromEntries(
+    cookieHeader.split("; ").map((cookie) => {
+      const [name, ...rest] = cookie.split("=");
+      return [name, rest.join("=")];
+    })
+  );
+};
 
-  console.log(path, account);
+const getCookies = (req) => {
+  const cookieHeader = req.headers.get("cookie");
+  return parseCookies(cookieHeader);
+};
 
-  // If user is not authenticated and trying to access a non-auth page, redirect to login
-  // if (!account && !path.startsWith("/auth")) {
-  //   return NextResponse.redirect(new URL("/auth/login", request.url));
-  // }
+const redirectTo = (destination, req) => {
+  return NextResponse.redirect(new URL(destination, req.url));
+};
 
-  // // If user is authenticated and trying to access an auth page, redirect to home
-  // if (account && path.startsWith("/auth")) {
-  //   return NextResponse.redirect(new URL("/", request.url));
-  // }
+const handleRedirects = (req) => {
+  const cookies = getCookies(req);
+  const token = cookies["token"];
+  const { pathname } = req.nextUrl;
 
-  // // Proceed to the next middleware or route handler
-  // return NextResponse.next();
+  // If no token, redirect to login if trying to access dashboard
+  if (!token && pathname.startsWith("/dashboard")) {
+    return redirectTo("/auth/login", req);
+  }
+
+  // If token exists and user is trying to access login, redirect to dashboard
+  if (token && pathname === "/auth/login") {
+    return redirectTo("/dashboard", req);
+  }
+
+  return NextResponse.next();
+};
+
+export default function middleware(req) {
+  return handleRedirects(req);
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/dashboard/:path*", "/auth/login"],
 };
