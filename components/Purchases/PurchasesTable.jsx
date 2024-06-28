@@ -164,7 +164,7 @@ const PurchasesTable = () => {
     <>
       <div>
         <Button color="primary" className="px-4 justify-end text-white">
-          <Link href={"/purchases/new"} color="primary" className="px-4 text-white">
+          <Link href={"/dashboard/purchases/new"} color="primary" className="px-4 text-white">
             <Plus /> New Purchases
           </Link>
         </Button>
