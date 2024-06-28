@@ -147,8 +147,9 @@ const ProductsTable = () => {
             color="MidnightBlue"
             size={18}
             onClick={(e) => {
-              setSelectedAgent(row);
-              setShowModal(true);
+              router.push(`/dashboard/products/edit/${row?._id}`);
+              // setSelectedAgent(row);
+              // setShowModal(true);
             }}
           />
           <Trash2
@@ -180,7 +181,7 @@ const ProductsTable = () => {
         query={{}}
         title="Products"
         url={ProductsApi}
-        onCreateAction={() => router.push("/products/Register")}
+        onCreateAction={() => router.push("/dashboard/products/new")}
       />
     </>
   );
