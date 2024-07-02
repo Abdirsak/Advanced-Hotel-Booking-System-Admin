@@ -1,10 +1,24 @@
 "use client";
 
-import { Fragment, useState, useEffect } from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+import { useQuery } from "@tanstack/react-query";
+import useCreate from "Hooks/useCreate";
+import useUpdate from "Hooks/useUpdate";
+import {
+  ProductCategoryApi,
+  ProductsApi,
+  SuppliersApi,
+  UsersAPI,
+} from "common/utils/axios/api";
+import request from "common/utils/axios/index";
+import { useRouter } from "next/navigation";
+import { Fragment, useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
-import Joi from "joi";
 import {
   Button,
+  Card,
   Col,
   Form,
   FormFeedback,
@@ -12,18 +26,8 @@ import {
   Label,
   Row,
   Spinner,
-  Container,
 } from "reactstrap";
-import {
-  ProductsApi,
-  SuppliersApi,
-  ProductCategoryApi,
-  UsersAPI,
-} from "common/utils/axios/api";
-import useCreate from "Hooks/useCreate";
-import useUpdate from "Hooks/useUpdate";
-import { useQuery } from "@tanstack/react-query"; // or "react-query" if using older version
-import request from "common/utils/axios/index";
+import * as yup from "yup";
 
 const fetchSuppliers = async () => {
   const response = await request({
@@ -48,6 +52,7 @@ const fetchUsers = async () => {
   });
   return response.data;
 };
+
 const useSuppliers = () => {
   return useQuery({
     queryKey: "suppliers",
@@ -68,49 +73,52 @@ const useUsers = () => {
     queryFn: fetchUsers,
   });
 };
-// Validation schema using Joi
-const schema = Joi.object({
-  name: Joi.string().min(2).max(50).required().label("Name"),
-  quantity: Joi.number().min(1).required().label("Quantity"),
-  price: Joi.number().min(1).required().label("Price"),
 
-  expireDate: Joi.date().required().label("expireDate"),
-  description: Joi.string().allow("", null).label("Description"),
+const schema = yup.object().shape({
+  name: yup.string().min(2).max(50).required("Name is required"),
+  quantity: yup.number().min(1).required("Quantity is required"),
+  price: yup.number().min(1).required("Price is required"),
+  expireDate: yup.date().required("Expire Date is required"),
+  description: yup.string().nullable(),
+  cost: yup.number().min(1).required("Cost is required"),
+  profilePicture: yup.string().nullable(),
+  category: yup.string().required("Category is required"),
+  supplier: yup.string().required("Supplier is required"),
+  brand: yup.string().required("Brand is required").oneOf(["New", "Old"]),
+});
 
-  cost: Joi.number().min(1).required().label("Cost"),
-  profilePicture: Joi.string().allow("", null).label("Profile Image"),
-  category: Joi.string().required().label("Category"),
-  supplier: Joi.string().required().label("supplier"),
-  brand: Joi.string().required().valid("New", "Old").label("Brand"),
-}).unknown();
+const defaultValues = {
+  name: "",
+  quantity: 0,
+  price: 0,
+  description: "",
+  cost: 0,
+  profilePicture: "",
+  category: "",
+  supplier: "",
+  expireDate: "",
+  brand: "New",
+  createdBy: "65fe91208f8240812e267742",
+};
 
-const ProductsRegistrationForm = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    quantity: 0,
-    price: 0,
-    description: "",
-    cost: 0,
-    profilePicture: "",
-    category: "",
-    supplier: "",
-    expireDate: "",
-    brand: "New",
-    createdBy: "65fe91208f8240812e267742",
+const ProductsRegistrationForm = ({ id = null }) => {
+  const router = useRouter();
+  const {
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+    reset,
+    watch,
+  } = useForm({
+    defaultValues,
+    resolver: yupResolver(schema),
   });
-  const handleDateChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-  const [errors, setErrors] = useState({});
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const [image, setImage] = useState(null);
 
   const { data: suppliersData } = useSuppliers();
   const { data: productCategories } = useProductCategories();
   const { data: usersData } = useUsers();
 
-  // console.log(suppliersData)
   const suppliersOptions = suppliersData?.data?.docs?.map((supplier) => ({
     value: supplier._id,
     label: supplier.SupplierName,
@@ -127,36 +135,62 @@ const ProductsRegistrationForm = () => {
   const { mutate, isPending: isLoading } = useCreate(
     ProductsApi,
     "Product Created Successfully",
-    () => {}
+    () => {
+      onDiscard();
+    }
   );
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
     ProductsApi,
     false,
-    () => {}
+    () => {
+      onDiscard();
+    }
   );
 
-  const specialtiesOptions = [
-    { value: "Renting", label: "Renting" },
-    { value: "Selling", label: "Selling" },
-    { value: "Keeping", label: "Keeping" },
-    { value: "Ordering", label: "Ordering" },
-  ];
+  useEffect(() => {
+    if (id) {
+      // Fetch product details and populate form
+      const fetchProduct = async () => {
+        const response = await request({
+          method: "GET",
+          url: `${ProductsApi}/${id}`,
+        });
+        const product = response.data;
+        reset(product?.data);
+      };
+      fetchProduct();
+    }
+  }, [id, reset]);
 
-  const handleChange = (selected) => {
-    setSelectedOptions(selected);
-    setFormData({ ...formData, specialties: selected.map((opt) => opt.value) });
-  };
+  const onSubmit = (data) => {
+    const validation = schema.validate(data, { abortEarly: false });
+    if (validation.error) {
+      const newErrors = {};
+      validation.error.details.forEach((err) => {
+        newErrors[err.path[0]] = err.message;
+      });
+      return;
+    }
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    // Convert expireDate to the appropriate date format
+    const formattedData = {
+      ...data,
+      expireDate: new Date(data.expireDate), // Convert to Date object
+    };
+
+    if (id) {
+      console.log(id);
+      mutateUpdate({ updateId: id, data: formattedData });
+    } else {
+      mutate(formattedData);
+    }
   };
 
   const setFileToBase64 = (file) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      setFormData({ ...formData, profilePicture: reader.result });
+      setValue("profilePicture", reader.result);
     };
   };
 
@@ -165,271 +199,257 @@ const ProductsRegistrationForm = () => {
     setFileToBase64(file);
   };
 
-  const validate = () => {
-    const result = schema.validate(formData, { abortEarly: false });
-    if (!result.error) return null;
-    const newErrors = {};
-    result.error.details.forEach((err) => {
-      newErrors[err.path[0]] = err.message;
-    });
-    return newErrors;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = validate();
-    console.log(newErrors);
-    setErrors(newErrors || {});
-    if (newErrors) return;
-    console.log(formData);
-    mutate(formData);
-  };
-
   const onDiscard = () => {
-    setFormData({
-      name: "",
-      quantity: 0,
-      price: 0,
-      description: "",
-      cost: 0,
-      profilePicture: "",
-      category: "",
-      supplier: "",
-      expireDate: "",
-      brand: "",
-    });
-    setErrors({});
+    router.replace("/dashboard/products");
   };
 
   return (
     <Fragment>
-      <Container>
-        <Form onSubmit={handleSubmit} className="m-5 shadow-lg p-2">
-          <Row className="justify-content-center">
-            <Col md={4} lg={4} sm={12} className="mb-2">
+      <Card className="m-4 p-4">
+        <h4 className="mb-4">Product Form</h4>
+        <Form onSubmit={handleSubmit(onSubmit)} className="">
+          <Row>
+            <Col md={6} sm={12} className="mb-2">
               <Label className="form-label" for="name">
                 Product Name
               </Label>
-              <Input
-                id="name"
+              <Controller
                 name="name"
-                placeholder="Name"
-                value={formData.name}
-                onChange={handleInputChange}
-                invalid={!!errors.name}
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id="name"
+                    placeholder="Name"
+                    invalid={!!errors.name}
+                  />
+                )}
               />
-              {errors.name && <FormFeedback>{errors.name}</FormFeedback>}
+              {errors.name && (
+                <FormFeedback>{errors.name.message}</FormFeedback>
+              )}
             </Col>
-            <Col md={4} lg={4} sm={12} className="mb-2">
+            <Col md={6} sm={12} className="mb-2">
               <Label className="form-label" for="category">
                 Category
               </Label>
-              <Select
-                id="category"
+              <Controller
                 name="category"
-                options={categoriesOptions}
-                value={categoriesOptions?.find(
-                  (option) => option.value === formData.category
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={categoriesOptions}
+                    value={categoriesOptions?.find(
+                      (option) => option.value === field.value
+                    )}
+                    onChange={(selected) => field.onChange(selected.value)}
+                  />
                 )}
-                onChange={(selected) =>
-                  setFormData({ ...formData, category: selected.value })
-                }
-                invalid={!!errors.category}
               />
               {errors.category && (
-                <FormFeedback>{errors.category}</FormFeedback>
+                <FormFeedback>{errors.category.message}</FormFeedback>
               )}
             </Col>
-            <Col md={4} lg={4} sm={12} className="mb-2">
+            <Col md={6} sm={12} className="mb-2">
               <Label className="form-label" for="supplier">
                 Supplier
               </Label>
-              <Select
-                id="supplier"
+              <Controller
                 name="supplier"
-                options={suppliersOptions}
-                value={suppliersOptions?.find(
-                  (option) => option.value === formData.supplier
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={suppliersOptions}
+                    value={suppliersOptions?.find(
+                      (option) => option.value === field.value
+                    )}
+                    onChange={(selected) => field.onChange(selected.value)}
+                  />
                 )}
-                onChange={(selected) =>
-                  setFormData({ ...formData, supplier: selected.value })
-                }
-                invalid={!!errors.supplier}
               />
               {errors.supplier && (
-                <FormFeedback>{errors.supplier}</FormFeedback>
+                <FormFeedback>{errors.supplier.message}</FormFeedback>
               )}
             </Col>
-          </Row>
 
-          <Row className="justify-content-center">
-            <Col md={3} lg={3} sm={12} className="mb-2">
+            <Col md={6} sm={12} className="mb-2">
               <Label className="form-label" for="brand">
                 Brand
               </Label>
-              <Input
-                id="brand"
+              <Controller
                 name="brand"
-                type="select"
-                value={formData.brand}
-                onChange={handleInputChange}
-                invalid={!!errors.brand}
-              >
-                <option value="New">New</option>
-                <option value="Old">Old</option>
-              </Input>
-
-              {errors.brand && <FormFeedback>{errors.brand}</FormFeedback>}
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="select"
+                    id="brand"
+                    invalid={!!errors.brand}
+                  >
+                    <option value="New">New</option>
+                    <option value="Old">Old</option>
+                  </Input>
+                )}
+              />
+              {errors.brand && (
+                <FormFeedback>{errors.brand.message}</FormFeedback>
+              )}
             </Col>
-            <Col md={2} lg={2} sm={12} className="mb-2">
+            <Col md={4} sm={12} className="mb-2">
               <Label className="form-label" for="quantity">
                 Quantity
               </Label>
-              <Input
-                id="quantity"
+              <Controller
                 name="quantity"
-                type="number"
-                placeholder="Quantity"
-                value={formData.quantity}
-                onChange={handleInputChange}
-                invalid={!!errors.quantity}
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="number"
+                    id="quantity"
+                    placeholder="Quantity"
+                    invalid={!!errors.quantity}
+                  />
+                )}
               />
               {errors.quantity && (
-                <FormFeedback>{errors.quantity}</FormFeedback>
+                <FormFeedback>{errors.quantity.message}</FormFeedback>
               )}
             </Col>
-            <Col md={2} lg={2} sm={12} className="mb-2">
+            <Col md={4} sm={12} className="mb-2">
               <Label className="form-label" for="price">
                 Price
               </Label>
-              <Input
-                id="price"
+              <Controller
                 name="price"
-                type="number"
-                placeholder="Price"
-                value={formData.price}
-                onChange={handleInputChange}
-                invalid={!!errors.price}
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="number"
+                    id="price"
+                    placeholder="Price"
+                    invalid={!!errors.price}
+                  />
+                )}
               />
-              {errors.price && <FormFeedback>{errors.price}</FormFeedback>}
+              {errors.price && (
+                <FormFeedback>{errors.price.message}</FormFeedback>
+              )}
             </Col>
-            <Col md={2} lg={2} sm={12} className="mb-2">
+            <Col md={4} sm={12} className="mb-2">
               <Label className="form-label" for="cost">
                 Cost
               </Label>
-              <Input
-                id="cost"
+              <Controller
                 name="cost"
-                type="number"
-                placeholder="Cost"
-                value={formData.cost}
-                onChange={handleInputChange}
-                invalid={!!errors.cost}
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="number"
+                    id="cost"
+                    placeholder="Cost"
+                    invalid={!!errors.cost}
+                  />
+                )}
               />
-              {errors.cost && <FormFeedback>{errors.cost}</FormFeedback>}
-            </Col>
-            <Col md={3} lg={3} sm={12} className="mb-2">
-              <Label className="form-label" for="expireDate">
-                expireDate
-              </Label>
-              <Input
-                id="expireDate"
-                name="expireDate"
-                type="date"
-                onChange={handleDateChange}
-                placeholder="expireDate"
-                value={formData.expireDate}
-                invalid={!!errors.expireDate}
-              />
-              {errors.expireDate && (
-                <FormFeedback>{errors.expireDate}</FormFeedback>
+              {errors.cost && (
+                <FormFeedback>{errors.cost.message}</FormFeedback>
               )}
             </Col>
-          </Row>
-
-          <Row className="justify-content-center">
-            {/* <Col md={4} lg={4} sm={12} className="mb-2">
-              <Label className="form-label" for="createdBy">Created By</Label>
-              <Select
-                id="createdBy"
-                name="createdBy"
-                options={categoriesOptions}
-                value={categoriesOptions?.find(option => option.value === formData.createdBy)}
-                onChange={(selected) => setFormData({ ...formData, createdBy: selected.value })}
-                invalid={!!errors.createdBy}
+            <Col md={6} sm={12} className="mb-2">
+              <Label className="form-label" for="expireDate">
+                Expiry Date
+              </Label>
+              <Controller
+                name="expireDate"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="date"
+                    id="expireDate"
+                    invalid={!!errors.expireDate}
+                  />
+                )}
               />
-              {errors.createdBy && <FormFeedback>{errors.createdBy}</FormFeedback>}
-            </Col> */}
-            <Col xs={12} className="mb-2">
+              {errors.expireDate && (
+                <FormFeedback>{errors.expireDate.message}</FormFeedback>
+              )}
+            </Col>
+
+            <Col md={12} sm={12} className="mb-2">
               <Label className="form-label" for="description">
                 Description
               </Label>
-              <Input
-                id="description"
+              <Controller
                 name="description"
-                type="textarea"
-                rows="3"
-                placeholder="Description"
-                value={formData.description}
-                onChange={handleInputChange}
-                invalid={!!errors.description}
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="textarea"
+                    id="description"
+                    placeholder="Description"
+                    invalid={!!errors.description}
+                  />
+                )}
               />
               {errors.description && (
-                <FormFeedback>{errors.description}</FormFeedback>
+                <FormFeedback>{errors.description.message}</FormFeedback>
+              )}
+            </Col>
+            <Col md={4} lg={4} sm={12} className="mb-2">
+              <Label className="form-label" for="profilePicture">
+                Profile Picture
+              </Label>
+              <Controller
+                name="profilePicture"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="file"
+                    id="profilePicture"
+                    onChange={handleImage}
+                  />
+                )}
+              />
+              {errors.profilePicture && (
+                <FormFeedback>{errors.profilePicture.message}</FormFeedback>
               )}
             </Col>
           </Row>
 
-          <Row className="justify-content-center">
-            <Col md={6} lg={6} sm={12}>
-              <Label className="form-label">Profile Picture</Label>
-              <Input
-                type="file"
-                name="image"
-                accept="image/png, image/gif, image/jpeg, image/jpg"
-                onChange={handleImage}
-              />
-            </Col>
-            <Col md={6} sm={12} lg={6}>
-              <div className="mb-2">
-                {image && (
-                  <img
-                    className="mt-3"
-                    src={image}
-                    alt="Applicant"
-                    style={{ width: "200px", height: "200px" }}
-                  />
-                )}
-              </div>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col className="d-flex justify-content-end my-5">
-              <Button
-                type="submit"
-                className="me-1"
-                color="primary"
-                disabled={isLoading || updateLoading}
-              >
-                {(isLoading || updateLoading) && (
-                  <Spinner size="sm" className="me-2" />
-                )}
-                {isLoading || updateLoading ? "Submitting..." : "Submit"}
-              </Button>
-              <Button
-                type="reset"
-                className="w-20"
-                color="dark"
-                outline
-                onClick={onDiscard}
-              >
-                Close
-              </Button>
-            </Col>
-          </Row>
+          <div className="float-end d-flex flex-col gap-2 gap-2">
+            <Button
+              type="reset"
+              className="w-20"
+              color="dark"
+              outline
+              onClick={onDiscard}
+            >
+              Close
+            </Button>
+            <Button
+              color="primary"
+              type="submit"
+              disabled={isLoading || updateLoading}
+            >
+              {isLoading || updateLoading ? (
+                <>
+                  <Spinner size="sm" /> Saving
+                </>
+              ) : (
+                "Save"
+              )}
+            </Button>
+          </div>
         </Form>
-      </Container>
+      </Card>
     </Fragment>
   );
 };
