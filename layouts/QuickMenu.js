@@ -34,7 +34,7 @@ const QuickMenu = () => {
 
   useEffect(() => {
     router.prefetch("/auth/login");
-  }, [router]);
+  }, []);
 
   const isDesktop = useMediaQuery({
     query: "(min-width: 1224px)",
