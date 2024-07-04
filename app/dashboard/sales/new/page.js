@@ -98,7 +98,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
       updatedsalesItems[index] = {
         ...updatedsalesItems[index],
         productId: selectedItem._id,
-        price: selectedItem.price.$numberDecimal,
+        price: selectedItem.price,
         quantityAvailable: selectedItem.quantity,
         total: updatedsalesItems[index].quantity * selectedItem.price
       };
@@ -380,4 +380,3 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
 };
 
 export default SalesFormRegistration;
-
