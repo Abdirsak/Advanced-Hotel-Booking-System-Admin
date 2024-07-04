@@ -117,9 +117,9 @@ const ProductsTable = () => {
     {
       name: "CreatedBy",
       sortable: true,
-      sortField: "createdBy.username",
-      selector: (row) => row?.createdBy?.username ?? "",
-      cell: (row) => <div className="">{row?.createdBy?.username ?? ""}</div>,
+      sortField: "createdBy.name",
+      selector: (row) => row?.createdBy?.name ?? "",
+      cell: (row) => <div className="">{row?.createdBy?.name ?? "N/A"}</div>,
     },
     {
       name: "Created Date",

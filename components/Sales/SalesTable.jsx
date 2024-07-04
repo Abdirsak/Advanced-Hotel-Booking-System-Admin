@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "reactstrap";
 //3rd party libraries
-import { Edit2, Trash2,Plus} from "react-feather";
+import { Edit2, Trash2, Plus } from "react-feather";
 import Link from "next/link";
 import { Badge } from "reactstrap";
 import moment from "moment";
@@ -128,11 +128,7 @@ const SalesTable = () => {
       selector: (row) => row?.balance.$numberDecimal ?? 0,
       cell: (row) => <div>{row?.balance.$numberDecimal ?? 0}</div>,
     },
-    
-    
-   
 
-    
     {
       name: "Actions",
       cell: (row) => (
@@ -165,13 +161,6 @@ const SalesTable = () => {
 
   return (
     <>
-      <div>
-        <Button color="primary" className="px-4 justify-end text-white">
-          <Link href={"/dashboard/sales/new"} color="primary" className="px-4 text-white">
-            <Plus /> New Sales
-          </Link>
-        </Button>
-      </div>
       {/* <SalesModal
         showModal={showModal}
         setShowModal={setShowModal}
@@ -180,7 +169,7 @@ const SalesTable = () => {
       /> */}
       <Table
         columns={columns}
-        // onCreateAction={() =>router.push("/dashboard/products/new")} 
+        onCreateAction={() => router.push("/dashboard/sales/new")}
         populate={[]}
         query={{}}
         title="Sales"

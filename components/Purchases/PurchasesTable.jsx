@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "reactstrap";
 //3rd party libraries
-import { Edit2, Trash2,Plus} from "react-feather";
+import { Edit2, Trash2, Plus } from "react-feather";
 import Link from "next/link";
 import { Badge } from "reactstrap";
 import moment from "moment";
@@ -22,10 +22,14 @@ const PurchasesTable = () => {
   const router = useRouter();
 
   //delete mutation
-  const { mutate, isPending: isLoading } = useDelete(PurchasesApi, false, () => {
-    //   setShowModal(false);
-    //   setSelectedRow(null);
-  });
+  const { mutate, isPending: isLoading } = useDelete(
+    PurchasesApi,
+    false,
+    () => {
+      //   setShowModal(false);
+      //   setSelectedRow(null);
+    }
+  );
 
   //delete function
   const handleConfirmDelete = async (id, name) => {
@@ -77,14 +81,18 @@ const PurchasesTable = () => {
       sortable: true,
       sortField: "purchaseDate",
       selector: (row) => row.purchaseDate,
-      cell: (row) => <div>{moment(row.purchaseDate).format("DD-MMM-YYYY")}</div>,
+      cell: (row) => (
+        <div>{moment(row.purchaseDate).format("DD-MMM-YYYY")}</div>
+      ),
     },
     {
       name: "Expected Date",
       sortable: true,
       sortField: "expectedDate",
       selector: (row) => row.expectedDate,
-      cell: (row) => <div>{moment(row.expectedDate).format("DD-MMM-YYYY")}</div>,
+      cell: (row) => (
+        <div>{moment(row.expectedDate).format("DD-MMM-YYYY")}</div>
+      ),
     },
     {
       name: "Order Status",
@@ -135,11 +143,14 @@ const PurchasesTable = () => {
       selector: (row) => row.invoiceId,
       cell: (row) => <div>{row.invoiceId || "N/A"}</div>,
     },
-   
+
     {
       name: "Actions",
       cell: (row) => (
-        <div style={{ justifyContent: "space-between", cursor: "pointer" }} className="column-action">
+        <div
+          style={{ justifyContent: "space-between", cursor: "pointer" }}
+          className="column-action"
+        >
           <Edit2
             style={{ marginRight: 10 }}
             color="MidnightBlue"
@@ -162,13 +173,13 @@ const PurchasesTable = () => {
 
   return (
     <>
-      <div>
+      {/* <div>
         <Button color="primary" className="px-4 justify-end text-white">
           <Link href={"/dashboard/purchases/new"} color="primary" className="px-4 text-white">
             <Plus /> New Purchases
           </Link>
         </Button>
-      </div>
+      </div> */}
       {/* <PurchasesModal
         showModal={showModal}
         setShowModal={setShowModal}
@@ -177,7 +188,7 @@ const PurchasesTable = () => {
       /> */}
       <Table
         columns={columns}
-        // onCreateAction={() => setShowModal(true)}
+        onCreateAction={() => router.push("/dashboard/purchases/new")}
         populate={[]}
         query={{}}
         title="Purchases"
