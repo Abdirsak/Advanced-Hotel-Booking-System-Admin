@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "reactstrap";
 //3rd party libraries
-import { Edit2, Trash2,Plus} from "react-feather";
+import { Edit2, Trash2, Plus } from "react-feather";
 import Link from "next/link";
 import { Badge } from "reactstrap";
 import moment from "moment";
@@ -128,11 +128,7 @@ const SalesTable = () => {
       selector: (row) => row?.balance ?? 0,
       cell: (row) => <div>{row?.balance ?? 0}</div>,
     },
-    
-    
-   
 
-    
     {
       name: "Actions",
       cell: (row) => (
@@ -180,7 +176,7 @@ const SalesTable = () => {
       /> */}
       <Table
         columns={columns}
-        onCreateAction={() =>router.push("/dashboard/sales/new")} 
+        onCreateAction={() => router.push("/dashboard/sales/new")}
         populate={[]}
         query={{}}
         title="Sales"
