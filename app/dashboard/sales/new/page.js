@@ -233,7 +233,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
             <tbody>
               {formData?.salesItems?.map((item, index) => (
                 <tr key={index}>
-                  <td style={{ width: "250px" }}>
+                  <td style={{ width: "300px" }}>
                     <Select
                       name={`salesItems[${index}].productId`}
                       options={productsOptions}

@@ -118,8 +118,8 @@ const PurchasesTable = () => {
       name: "Total Amount",
       sortable: true,
       sortField: "totalAmount",
-      selector: (row) => row.totalAmount.$numberDecimal,
-      cell: (row) => <div>{row.totalAmount.$numberDecimal}</div>,
+      selector: (row) => row.totalAmount,
+      cell: (row) => <div>{row.totalAmount}</div>,
     },
     {
       name: "Tax Information",
@@ -162,13 +162,13 @@ const PurchasesTable = () => {
 
   return (
     <>
-      <div>
-        <Button color="primary" className="px-4 justify-end text-white">
+      {/* <div className="flex">
+        <Button color="primary" className="px-4 text-white  justify-end">
           <Link href={"/dashboard/purchases/new"} color="primary" className="px-4 text-white">
             <Plus /> New Purchases
           </Link>
         </Button>
-      </div>
+      </div> */}
       {/* <PurchasesModal
         showModal={showModal}
         setShowModal={setShowModal}
@@ -177,7 +177,7 @@ const PurchasesTable = () => {
       /> */}
       <Table
         columns={columns}
-        // onCreateAction={() => setShowModal(true)}
+        onCreateAction={() => router.push("/dashboard/purchases/new")}
         populate={[]}
         query={{}}
         title="Purchases"

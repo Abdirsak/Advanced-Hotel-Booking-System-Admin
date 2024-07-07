@@ -4,7 +4,7 @@ import { Fragment, useState, useEffect } from "react";
 import Select from 'react-select';
 import Joi from "joi";
 import {
-  Button, Col, Form, FormFeedback, Input, Label, Row, Spinner, Container, Table
+  Button, Col, Form, FormFeedback, Input, Label, Row, Spinner, Card, Table
 } from "reactstrap";
 import { SuppliersApi, ProductsApi, PurchasesApi } from "common/utils/axios/api";
 import useCreate from "hooks/useCreate";
@@ -166,9 +166,12 @@ const PurchaseForm = () => {
   };
 
   return (
+
     <Fragment>
-      <Container>
-        <Form onSubmit={handleSubmit} className="m-5 shadow-lg p-2">
+      <Card className="m-4 p-4">
+        <h4 className="mb-4">Product Form</h4>
+
+        <Form onSubmit={handleSubmit} className="">
           <Row className="justify-content-center">
             <Col md={4} lg={4} sm={12} className="mb-2">
               <Label className="form-label" for="supplierId">Supplier</Label>
@@ -306,7 +309,7 @@ const PurchaseForm = () => {
             <tbody>
               {formData.items.map((item, index) => (
                 <tr key={index}>
-                  <td>
+                  <td style={{width:"300px"}}>
                     <Select
                       name={`items[${index}].productId`}
                       options={productsOptions}
@@ -362,6 +365,7 @@ const PurchaseForm = () => {
                 <td colSpan="5"></td>
                 <td>
                   <Button
+                  className="px-2"
                     color="success"
                     onClick={() => setFormData({ ...formData, items: [...formData.items, { productId: "", quantityAvailable: 0, quantity: 0, cost: 0, total: 0 }] })}
                   >
@@ -407,7 +411,7 @@ const PurchaseForm = () => {
             </Col>
           </Row>
         </Form>
-      </Container>
+      </Card>
     </Fragment>
   );
 };

@@ -88,9 +88,9 @@ const SalesFormRegistration = ({id }) => {
       updatedSalesItems[index] = {
         ...updatedSalesItems[index],
         productId: selectedItem._id,
-        price: selectedItem.price.$numberDecimal,
+        price: selectedItem.price,
         quantityAvailable: selectedItem.quantity,
-        total: updatedSalesItems[index].quantity * selectedItem.price.$numberDecimal
+        total: updatedSalesItems[index].quantity * selectedItem.price
       };
       setFormData({ ...formData, salesItems: updatedSalesItems });
     }
@@ -119,13 +119,13 @@ const SalesFormRegistration = ({id }) => {
     if (id) {
       fetchSale(id).then(sale => {
         // Convert totalAmount, discount, and salesItems total and price to numbers
-        sale.totalAmount = parseFloat(sale.totalAmount.$numberDecimal);
-        sale.discount = parseFloat(sale.discount.$numberDecimal);
-        // formData.paidBalance = parseFloat(sale.totalAmount.$numberDecimal);
+        sale.totalAmount = parseFloat(sale.totalAmount);
+        sale.discount = parseFloat(sale.discount);
+        // formData.paidBalance = parseFloat(sale.totalAmount);
         sale.salesItems = sale.salesItems.map(item => ({
           ...item,
-          total: parseFloat(item.total.$numberDecimal),
-          price: parseFloat(item.price.$numberDecimal)
+          total: parseFloat(item.total),
+          price: parseFloat(item.price)
         }));
         setFormData(sale);
       });

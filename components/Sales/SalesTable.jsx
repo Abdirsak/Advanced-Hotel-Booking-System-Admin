@@ -97,36 +97,36 @@ const SalesTable = () => {
       name: "Price",
       sortable: true,
       sortField: "salesItems?.price",
-      selector: (row) => row?.salesItems?.price.$numberDecimal,
-      cell: (row) => <div>{row?.salesItems?.price.$numberDecimal}</div>,
+      selector: (row) => row?.salesItems?.price,
+      cell: (row) => <div>{row?.salesItems?.price}</div>,
     },
     {
       name: "Amount",
       sortable: true,
       sortField: "salesItems?.total",
-      selector: (row) => row?.salesItems?.total.$numberDecimal,
-      cell: (row) => <div>{row?.salesItems?.total.$numberDecimal}</div>,
+      selector: (row) => row?.salesItems?.total,
+      cell: (row) => <div>{row?.salesItems?.total}</div>,
     },
     {
       name: "Paid",
       sortable: true,
       sortField: "totalAmount",
-      selector: (row) => row?.totalAmount.$numberDecimal,
-      cell: (row) => <div>{row?.totalAmount.$numberDecimal}</div>,
+      selector: (row) => row?.totalAmount,
+      cell: (row) => <div>{row?.totalAmount}</div>,
     },
     {
       name: "Discount",
       sortable: true,
       sortField: "discount",
-      selector: (row) => row?.discount.$numberDecimal,
-      cell: (row) => <div>{row?.discount.$numberDecimal}</div>,
+      selector: (row) => row?.discount,
+      cell: (row) => <div>{row?.discount}</div>,
     },
     {
       name: "Balance",
       sortable: true,
       sortField: "balance",
-      selector: (row) => row?.balance.$numberDecimal ?? 0,
-      cell: (row) => <div>{row?.balance.$numberDecimal ?? 0}</div>,
+      selector: (row) => row?.balance ?? 0,
+      cell: (row) => <div>{row?.balance ?? 0}</div>,
     },
     
     
@@ -165,13 +165,13 @@ const SalesTable = () => {
 
   return (
     <>
-      <div>
+      {/* <div>
         <Button color="primary" className="px-4 justify-end text-white">
           <Link href={"/dashboard/sales/new"} color="primary" className="px-4 text-white">
             <Plus /> New Sales
           </Link>
         </Button>
-      </div>
+      </div> */}
       {/* <SalesModal
         showModal={showModal}
         setShowModal={setShowModal}
@@ -180,7 +180,7 @@ const SalesTable = () => {
       /> */}
       <Table
         columns={columns}
-        // onCreateAction={() =>router.push("/dashboard/products/new")} 
+        onCreateAction={() =>router.push("/dashboard/sales/new")} 
         populate={[]}
         query={{}}
         title="Sales"
