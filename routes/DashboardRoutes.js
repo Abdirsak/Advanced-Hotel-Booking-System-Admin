@@ -41,12 +41,7 @@ export const DashboardMenu = [
     title: "Inventory and Products",
     grouptitle: true,
   },
-  {
-    id: uuid(),
-    link: "/dashboard/categories",
-    icon: "layout",
-    title: "categories",
-  },
+
   {
     id: uuid(),
     link: "/dashboard/products",
@@ -119,7 +114,7 @@ export const DashboardMenu = [
       },
       {
         id: uuid(),
-        link: "/dashboard/productCategories",
+        link: "/dashboard/product-categories",
         name: "Product Category",
       },
     ],

@@ -20,18 +20,19 @@ import {
 } from "reactstrap";
 
 //custom packages
-import { ProductCategoryApi } from "common/utils/axios/api";
+import { CategoryAPI } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
 import useUpdate from "Hooks/useUpdate";
 
 //validation schema
 const schema = Joi.object({
-  name: Joi.string().min(2).max(20).required().label("Name"),
-  description: Joi.string().label("description"),
+  name: Joi.string().min(3).max(50).required().label("Name"),
+  description: Joi.string().min(2).max(50).required().label("Description"),
+  status: Joi.string().min(2).max(50).required().label("status"),
 });
 
 //component
-const CategoryModal = ({
+const UsersModal = ({
   showModal,
   setShowModal,
   selectedRow = null,
@@ -40,6 +41,7 @@ const CategoryModal = ({
   const defaultValues = {
     name: selectedRow?.name || "",
     description: selectedRow?.description || "",
+    status: selectedRow?.status || "Active",
   };
 
   const {
@@ -53,24 +55,27 @@ const CategoryModal = ({
   } = useForm({ defaultValues, resolver: joiResolver(schema) });
 
   const { mutate, isPending: isLoading } = useCreate(
-    ProductCategoryApi,
-    "Prooduct Category Created Successfully",
+    CategoryAPI,
+    "users Created Successfully",
     () => {
       setShowModal(false);
     }
   );
 
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
-    ProductCategoryApi,
-    "Prooduct Category Updated Successfully",
+    CategoryAPI,
+    "Users Updated Successfully",
     () => {
       setShowModal(false);
       setSelectedRow(null);
     }
   );
 
+  console.log("selected row :", selectedRow);
+
   const onSubmit = (data) => {
     if (selectedRow) {
+      console.log("submitted Data :", data);
       mutateUpdate({ data, updateId: selectedRow?._id });
     } else {
       mutate(data);
@@ -94,6 +99,7 @@ const CategoryModal = ({
         ...defaultValues,
         name: selectedRow?.name || "",
         description: selectedRow?.description || "",
+        status: selectedRow?.status || "Active",
       });
     }
   }, [selectedRow]);
@@ -122,7 +128,7 @@ const CategoryModal = ({
                   render={({ field }) => (
                     <Input
                       id="name"
-                      placeholder="name"
+                      placeholder="Name"
                       {...register(
                         "name",
                         { required: true },
@@ -147,21 +153,52 @@ const CategoryModal = ({
                   control={control}
                   render={({ field }) => (
                     <Input
-                    id="description"
-                    placeholder="description"
-                    {...register(
-                      "description",
-                      { required: true },
-                      "description is required"
-                    )}
-                    invalid={errors.description && true}
-                    {...field}
-                  />
+                      id="description"
+                      type="textarea"
+                      placeholder="Full Name"
+                      {...register(
+                        "description",
+                        { required: true },
+                        "Description is required"
+                      )}
+                      invalid={errors.description && true}
+                      {...field}
+                    />
+                  )}
+                />
+                {errors.description && (
+                  <FormFeedback>{errors.description.message}</FormFeedback>
                 )}
-              />
-              {errors.description && (
-                <FormFeedback>{errors.description.message}</FormFeedback>
-              )}
+              </Col>
+
+              <Col xs={12} className="mb-2">
+                <Label className="form-label" for="status">
+                  Status
+                </Label>
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="status"
+                      type="select"
+                      placeholder="status"
+                      {...register(
+                        "status",
+                        { required: true },
+                        "Status is required"
+                      )}
+                      invalid={errors.status && true}
+                      {...field}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">InActive</option>
+                    </Input>
+                  )}
+                />
+                {errors.status && (
+                  <FormFeedback>{errors.status.message}</FormFeedback>
+                )}
               </Col>
             </Row>
           </ModalBody>
@@ -195,4 +232,4 @@ const CategoryModal = ({
   );
 };
 
-export default CategoryModal;
+export default UsersModal;
