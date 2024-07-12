@@ -9,10 +9,10 @@ import { Container } from "react-bootstrap";
 import { PageHeading } from "widgets";
 import CategoryTable from "./CategoryTable";
 
-const Category = () => {
+const Users = () => {
   return (
     <Container fluid className="p-6">
-      {/* <PageHeading heading="Categories" /> */}
+      {/* <PageHeading heading="Users" /> */}
       <div className="py-2">
         <CategoryTable />
       </div>
@@ -20,4 +20,4 @@ const Category = () => {
   );
 };
 
-export default Category;
+export default Users;
