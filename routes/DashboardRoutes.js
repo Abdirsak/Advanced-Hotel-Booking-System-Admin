@@ -95,7 +95,12 @@ export const DashboardMenu = [
   { id: uuid(), link: "/invoices", icon: "layout", title: "Invoices" },
   { id: uuid(), link: "/payments", icon: "layout", title: "Payments" },
   { id: uuid(), link: "/receipts", icon: "layout", title: "Receipts" },
-  { id: uuid(), link: "/expenses", icon: "layout", title: "Expenses" },
+  {
+    id: uuid(),
+    link: "/dashboard/expenses",
+    icon: "layout",
+    title: "Expenses",
+  },
 
   {
     id: uuid(),
