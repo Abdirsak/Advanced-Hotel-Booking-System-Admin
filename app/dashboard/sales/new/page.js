@@ -4,7 +4,7 @@ import { Fragment, useState, useEffect } from "react";
 import Select from 'react-select';
 import Joi from "joi";
 import {
-  Button, Col, Form, FormFeedback, Input, Label, Row, Spinner, Container, Table
+  Button, Col, Form, FormFeedback, Input, Label, Row, Spinner, Container, Table,Card
 } from "reactstrap";
 import { CustomersApi, ProductsApi, SalesApi } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
@@ -52,6 +52,7 @@ const schema = Joi.object({
   discount: Joi.number().optional().allow(0).label("Discount"),
   paidBalance: Joi.number().optional().allow(0).label("Paid Balance"),
   status: Joi.string().valid("completed", "pending", "cancelled").required().label("Status"),
+  reference: Joi.string().required().label("Reference"),
   salesItems: Joi.array().items(
     Joi.object({
       productId: Joi.string().required().label("Product"),
@@ -66,7 +67,7 @@ const schema = Joi.object({
 const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelectedRow }) => {
   const [formData, setFormData] = useState({
     customer: "", saleDate: "", totalAmount: 0, discount: 0, status: "pending",
-    paidBalance:0,
+    paidBalance:0,reference:"",
     salesItems: [{ productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }]
   });
   const [errors, setErrors] = useState({});
@@ -175,8 +176,9 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
   return (
     <Fragment>
        <ToastContainer />
-      <Container>
-        <Form onSubmit={handleSubmit} className="m-5 shadow-lg p-2">
+
+      <Card className="m-4 p-4">
+        <Form onSubmit={handleSubmit} className="">
           <Row className="justify-content-center">
             <Col md={4} lg={4} sm={12} className="mb-2">
               <Label className="form-label" for="customer">Customer</Label>
@@ -190,7 +192,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
               />
               {errors.customer && <FormFeedback>{errors.customer}</FormFeedback>}
             </Col>
-            <Col md={4} lg={4} sm={12} className="mb-2">
+            <Col md={4} lg={3} sm={12} className="mb-2">
               <Label className="form-label" for="saleDate">Sale Date</Label>
               <Input
                 id="saleDate"
@@ -202,7 +204,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
               />
               {errors.saleDate && <FormFeedback>{errors.saleDate}</FormFeedback>}
             </Col>
-            <Col md={4} lg={4} sm={12} className="mb-2">
+            <Col md={4} lg={2} sm={12} className="mb-2">
               <Label className="form-label" for="status">Status</Label>
               <Input
                 id="status"
@@ -217,6 +219,17 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
                 <option value="cancelled">Cancelled</option>
               </Input>
               {errors.status && <FormFeedback>{errors.status}</FormFeedback>}
+            </Col>
+            <Col xs={3} className="mb-2">
+              <Label for="reference">Reference</Label>
+              <Input
+                type="text"
+                name="reference"
+                value={formData.reference}
+                onChange={handleInputChange}
+                invalid={!!errors.reference}
+              />
+              {errors.reference && <FormFeedback>{errors.reference}</FormFeedback>}
             </Col>
           </Row>
           <Table responsive>
@@ -374,7 +387,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
             </Col>
           </Row>
         </Form>
-      </Container>
+      </Card>
     </Fragment>
   );
 };
