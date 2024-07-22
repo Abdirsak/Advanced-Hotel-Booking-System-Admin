@@ -9,19 +9,19 @@ import Swal from "sweetalert2";
 
 //custom packages
 import Table from "common/Table";
-import { EmployeesApi } from "common/utils/axios/api";
-import EmployeesModal from "./ReceiptModal";
+import { ReceiptsApi } from "common/utils/axios/api";
+import ReceiptsModal from "./ReceiptModal";
 import useDelete from "hooks/useDelete";
 
 //
 
-const EmployeesTable = () => {
+const ReceiptsTable = () => {
   const [showModal, setShowModal] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
   const router = useRouter();
 
   //delete mutation
-  const { mutate, isPending: isLoading } = useDelete(EmployeesApi, false, () => {
+  const { mutate, isPending: isLoading } = useDelete(ReceiptsApi, false, () => {
     //   setShowModal(false);
     //   setSelectedRow(null);
   });
@@ -29,7 +29,7 @@ const EmployeesTable = () => {
   //delete function
   const handleConfirmDelete = async (id, name) => {
     return Swal.fire({
-      title: `Delete Employee ${name}?`,
+      title: `Delete Receipt ${name}?`,
       text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
@@ -53,74 +53,81 @@ const EmployeesTable = () => {
       name: "Name",
       sortable: true,
       sortField: "name",
-      selector: (row) => row?.fullName ?? "",
-      cell: (row) => <div className="">{row?.fullName ?? ""}</div>,
+      selector: (row) => row?.customerData?.fullName ?? "",
+      cell: (row) => <div className="">{row?.customerData?.fullName ?? ""}</div>,
     },
 
     {
       name: "Gender",
       sortable: true,
       sortField: "gender",
-      selector: (row) => row.gender,
-      cell: (row) => <div className="">{row?.gender ?? ""}</div>,
+      selector: (row) => row.customerData?.gender,
+      cell: (row) => <div className="">{row?.customerData?.gender ?? ""}</div>,
     },
     {
       name: "Contact",
       sortable: true,
       sortField: "contact",
-      selector: (row) => row.contact,
-      cell: (row) => <div className="">{row?.contact ?? ""}</div>,
+      selector: (row) => row.customerData?.contact,
+      cell: (row) => <div className="">{row?.customerData?.contact ?? ""}</div>,
     },
     {
-      name: "Emergencey Contact",
+      name: "ReceiptNo",
       sortable: true,
-      sortField: "emergencyContact",
-      selector: (row) => row.emergencyContact,
-      cell: (row) => <div className="">{row?.emergencyContact ?? ""}</div>,
+      sortField: "ReceiptNo",
+      selector: (row) => row.receiptNo,
+      cell: (row) => <div className="">{row?.receiptNo ?? ""}</div>,
     },
     {
-      name: "Address",
+      name: "Method",
       sortable: true,
-      sortField: "address",
-      selector: (row) => row.address,
-      cell: (row) => <div className="">{row?.address ?? ""}</div>,
+      sortField: "method",
+      selector: (row) => row.method,
+      cell: (row) => <div className="">{row?.method ?? ""}</div>,
     },
     {
-      name: "Salary",
+      name: "Total Amount",
       sortable: true,
-      sortField: "salary",
-      selector: (row) => row.salary,
-      cell: (row) => <div className="">{row?.salary ?? ""}</div>,
+      sortField: "totalAmount",
+      selector: (row) => row.invoiceData.totalAmount,
+      cell: (row) => <div className="">{row?.invoiceData.totalAmount ?? ""}</div>,
     },
     {
-      name: "Department",
+      name: "amount",
       sortable: true,
-      sortField: "department",
-      selector: (row) => row?.department,
-      cell: (row) => <div className="">{row?.department ?? ""}</div>,
+      sortField: "amount",
+      selector: (row) => row.amount,
+      cell: (row) => <div className="">{row?.amount ?? ""}</div>,
     },
     {
-      name: "Position",
+      name: "Balance",
       sortable: true,
-      sortField: "position",
-      selector: (row) => row?.position,
-      cell: (row) => <div className="">{row?.position ?? ""}</div>,
+      sortField: "balance",
+      selector: (row) => row?.balance,
+      cell: (row) => <div className="">{row?.balance ?? ""}</div>,
+    },
+    {
+      name: "Status",
+      sortable: true,
+      sortField: "status",
+      selector: (row) => row?.invoiceData.status,
+      cell: (row) => <div className="">{row?.invoiceData.status ?? ""}</div>,
     },
    
     {
-      name: "Hire Date",
+      name: "Sale Date",
       sortable: true,
-      sortField: "hireDate",
-      selector: (row) => row.hireDate,
+      sortField: "salesData.createdAt",
+      selector: (row) => row.salesData.createdAt,
       cell: (row) => (
         <span className="text-capitalize">
           {" "}
-          {moment(row.hireDate).format("DD-MMM-YYYY")}
+          {moment(row.salesData.createdAt).format("DD-MMM-YYYY")}
         </span>
       ),
     },
     {
-      name: "Created Date",
+      name: "Receipt Date",
       sortable: true,
       sortField: "createdAt",
       selector: (row) => row.createdAt,
@@ -148,7 +155,7 @@ const EmployeesTable = () => {
             size={18}
             onClick={(e) => {
               // router.push("/create");
-              setSelectedEmployee(row);
+              setSelectedReceipt(row);
               setShowModal(true);
             }}
           />
@@ -166,23 +173,23 @@ const EmployeesTable = () => {
   ];
   return (
     <>
-      <EmployeesModal
+      <ReceiptsModal
         showModal={showModal}
         setShowModal={setShowModal}
-        selectedRow={selectedEmployee}
-        setSelectedRow={setSelectedEmployee}
+        selectedRow={selectedReceipt}
+        setSelectedRow={setSelectedReceipt}
       />
       <Table
         columns={columns}
         onCreateAction={() => setShowModal(true)}
         populate={[]}
         query={{}}
-        title="Employees"
-        url={EmployeesApi}
+        title="Receipts"
+        url={ReceiptsApi}
         searchFields={["name"]}
       />
     </>
   );
 };
 
-export default EmployeesTable;
+export default ReceiptsTable;

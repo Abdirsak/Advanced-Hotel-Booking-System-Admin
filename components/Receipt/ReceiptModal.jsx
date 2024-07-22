@@ -390,7 +390,7 @@ const InvoiceModal = ({
               </Col>
             </Row>
             <Row>
-              <Col xs={12} md={6} lg={4} className="mb-2">
+              <Col xs={12} md={12} lg={12} className="mb-2">
                 <Label className="form-label" for="description">
                   Description
                 </Label>
@@ -400,6 +400,7 @@ const InvoiceModal = ({
                   render={({ field }) => (
                     <Input
                       id="description"
+                      className="py-4"
                       placeholder="Description"
                       {...register("description")}
                       invalid={errors.description && true}
