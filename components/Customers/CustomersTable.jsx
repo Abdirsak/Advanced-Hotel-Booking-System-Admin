@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 
 //custom packages
 import Table from "common/Table";
-import { customersApi } from "common/utils/axios/api";
+import { CustomersApi } from "common/utils/axios/api";
 import CustomersModal from "./CustomersModal";
 import useDelete from "hooks/useDelete";
 
@@ -21,7 +21,7 @@ const CustomersTable = () => {
   const router = useRouter();
 
   //delete mutation
-  const { mutate, isPending: isLoading } = useDelete(customersApi, false, () => {
+  const { mutate, isPending: isLoading } = useDelete(CustomersApi, false, () => {
     //   setShowModal(false);
     //   setSelectedRow(null);
   });
@@ -144,7 +144,7 @@ const CustomersTable = () => {
         populate={[]}
         query={{}}
         title="Customers"
-        url={customersApi}
+        url={CustomersApi}
         searchFields={["name"]}
       />
     </>

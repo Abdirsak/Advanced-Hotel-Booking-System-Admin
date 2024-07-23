@@ -22,7 +22,7 @@ import {
 } from "reactstrap";
 
 // custom packages
-import { EmployeesApi, UsersAPI } from "common/utils/axios/api";
+import { EmployeesApi, UsersAPI,BranchesApi } from "common/utils/axios/api";
 import useCreate from "hooks/useCreate";
 import useUpdate from "hooks/useUpdate";
 
@@ -38,13 +38,21 @@ const schema = Joi.object({
   hiringDate: Joi.date().required().label("Hiring Date"),
   salary: Joi.number().required().label("Salary"),
   emergencyContact: Joi.string().required().label("Emergency Contact"),
-  user: Joi.string().allow(null).label("User")
+  user: Joi.string().allow(null).label("User"),
+  branch: Joi.string().allow(null).label("Branch")
 });
 
 const fetchUsers = async () => {
   const response = await request({
     method: 'GET',
     url: UsersAPI,
+  });
+  return response.data;
+};
+const fetchBranches = async () => {
+  const response = await request({
+    method: 'GET',
+    url: BranchesApi,
   });
   return response.data;
 };
@@ -61,6 +69,12 @@ const useUsers = () => {
   return useQuery({
     queryKey: 'users',
     queryFn: fetchUsers,
+  });
+};
+const useBranches = () => {
+  return useQuery({
+    queryKey: 'branches',
+    queryFn: fetchBranches,
   });
 };
 
@@ -94,6 +108,7 @@ const EmployeeModal = ({
 }) => {
   const queryClient = useQueryClient();
   const { data: usersData } = useUsers();
+  const { data: branchesData } = useBranches();
   console.log(selectedRow)
   const defaultValues = {
     fullName: "",
@@ -106,7 +121,8 @@ const EmployeeModal = ({
     hiringDate: "",
     salary: "",
     emergencyContact: "",
-    user: null
+    user: null,
+    branch:null
   };
 
   const {
@@ -171,6 +187,7 @@ const EmployeeModal = ({
         salary: selectedRow?.salary || "",
         emergencyContact: selectedRow?.emergencyContact || "",
         user: selectedRow?.user?._id || null,
+        branch: selectedRow?.branch?._id || null,
       });
     }
   }, [selectedRow, reset]);
@@ -184,7 +201,7 @@ const EmployeeModal = ({
           </ModalHeader>
           <ModalBody>
             <Row className="justify-content-center">
-              <Col xs={12} md={8} lg={8} className="mb-2">
+              <Col xs={12} md={12} lg={5} className="mb-2">
                 <Label className="form-label" for="fullName">
                   Full Name
                 </Label>
@@ -206,7 +223,7 @@ const EmployeeModal = ({
                 )}
               </Col>
              
-              <Col xs={12} md={4} lg={4} className="mb-2">
+              <Col xs={12} md={6} lg={3} className="mb-2">
                 <Label className="form-label" for="gender">
                   Gender
                 </Label>
@@ -231,8 +248,6 @@ const EmployeeModal = ({
                   <FormFeedback>{errors.gender.message}</FormFeedback>
                 )}
               </Col>
-              </Row>
-              <Row>
               <Col xs={12} md={6} lg={4} className="mb-2">
                 <Label className="form-label" for="dateOfBirth">
                   Date of Birth
@@ -255,6 +270,9 @@ const EmployeeModal = ({
                   <FormFeedback>{errors.dateOfBirth.message}</FormFeedback>
                 )}
               </Col>
+              </Row>
+              <Row>
+             
               <Col xs={12} md={6} lg={4} className="mb-2">
                 <Label className="form-label" for="contact">
                   Contact
@@ -297,10 +315,7 @@ const EmployeeModal = ({
                   <FormFeedback>{errors.emergencyContact.message}</FormFeedback>
                 )}
               </Col>
-             
-              </Row>
-              <Row>
-    <Col xs={12} md={6} lg={4} className="mb-2">
+              <Col xs={12} md={12} lg={4} className="mb-2">
       <Label className="form-label" for="address">
         Address
       </Label>
@@ -321,6 +336,38 @@ const EmployeeModal = ({
         <FormFeedback>{errors.address.message}</FormFeedback>
       )}
     </Col>
+              </Row>
+              <Row>
+              <Col xs={12} md={6} lg={4} className="mb-2">
+                <Label className="form-label" for="branch">
+                  Branch
+                </Label>
+                <Controller
+                  name="branch"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="branch"
+                      type="select"
+                      {...register("branch")}
+                      invalid={errors.branch && true}
+                      {...field}
+                      defaultValue={selectedRow ? selectedRow?.branch?._id : ""}
+                    >
+                      <option value="">Select Branch</option>
+                      {branchesData?.data?.docs?.map((branch) => (
+                        <option key={branch._id} value={branch._id}>
+                          {branch?.name}
+                        </option>
+                      ))}
+                    </Input>
+                  )}
+                />
+                {errors.branch && (
+                  <FormFeedback>{errors.branch.message}</FormFeedback>
+                )}
+              </Col>
+ 
     <Col xs={12} md={6} lg={4} className="mb-2">
       <Label className="form-label" for="hiringDate">
         Hiring Date
@@ -424,7 +471,7 @@ const EmployeeModal = ({
                 )}
               </Col>
              
-              <Col xs={12} md={6} lg={4} className="mb-2">
+              <Col xs={12} md={12} lg={4} className="mb-2">
                 <Label className="form-label" for="user">
                   User
                 </Label>

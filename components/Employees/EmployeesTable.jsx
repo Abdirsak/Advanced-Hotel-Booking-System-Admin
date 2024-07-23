@@ -54,7 +54,7 @@ const EmployeesTable = () => {
       sortable: true,
       sortField: "name",
       selector: (row) => row?.fullName ?? "",
-      cell: (row) => <div className="">{row?.fullName ?? ""}</div>,
+      cell: (row) => <div className="" style={{ width: "600px" }}>{row?.fullName ?? ""}</div>,
     },
 
     {

@@ -6,7 +6,7 @@ import Joi from "joi";
 import {
   Button, Col, Form, FormFeedback, Input, Label, Row, Spinner, Card, Table
 } from "reactstrap";
-import { SuppliersApi, ProductsApi, PurchasesApi } from "common/utils/axios/api";
+import { SuppliersApi, ProductsApi, PurchasesApi,BranchesApi } from "common/utils/axios/api";
 import useCreate from "hooks/useCreate";
 import useUpdate from "hooks/useUpdate";
 import { useQuery } from "@tanstack/react-query";
@@ -29,6 +29,20 @@ const fetchProducts = async () => {
   });
   return response.data;
 };
+// fetch branches
+const fetchBranches = async () => {
+  const response = await request({
+    method: 'GET',
+    url: BranchesApi,
+  });
+  return response.data;
+};
+const useBranches = () => {
+  return useQuery({
+    queryKey: 'branches',
+    queryFn: fetchBranches,
+  });
+};
 
 const useSuppliers = () => {
   return useQuery({
@@ -46,6 +60,7 @@ const useProducts = () => {
 
 const schema = Joi.object({
   supplierId: Joi.string().required().label("Supplier"),
+  branch: Joi.string().required().label("Brach"),
   purchaseDate: Joi.date().required().label("Purchase Date"),
   reference: Joi.string().required().label("Reference No"),
   expectedDate: Joi.date().required().label("Expected Date"),
@@ -60,7 +75,7 @@ const schema = Joi.object({
 
 const PurchaseForm = () => {
   const [formData, setFormData] = useState({
-    supplierId: "", purchaseDate: "", reference: "", expectedDate: "",
+    supplierId: "", purchaseDate: "", reference: "", expectedDate: "",branch:"",
     orderStatus: "Pending", paymentStatus: "Pending", billingAddress: "",
     shippingAddress: "", items: [{ productId: "", quantityAvailable: 0, quantity: 0, cost: 0, total: 0 }],
     totalAmount: 0, taxInformation: "", invoiceId: ""
@@ -68,7 +83,7 @@ const PurchaseForm = () => {
   const [errors, setErrors] = useState({});
   const { data: suppliersData } = useSuppliers();
   const { data: productsData } = useProducts();
-
+  const { data: branchesData } = useBranches();
   const { mutate, isPending: isLoading } = useCreate(
     PurchasesApi, "Purchase Created Successfully", () => { }
   );
@@ -78,6 +93,7 @@ const PurchaseForm = () => {
 
   const suppliersOptions = suppliersData?.data?.docs?.map(supplier => ({ value: supplier._id, label: supplier.SupplierName }));
   const productsOptions = productsData?.data?.docs?.map(product => ({ value: product._id, label: product.name }));
+  const branchesOptions = branchesData?.data?.docs?.map(branch => ({ value: branch._id, label: branch.name }));
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -126,6 +142,7 @@ const PurchaseForm = () => {
   const validate = () => {
     const result = schema.validate({
       supplierId: formData.supplierId,
+      branch: formData.branch,
       purchaseDate: formData.purchaseDate,
       reference: formData.reference,
       expectedDate: formData.expectedDate,
@@ -160,7 +177,7 @@ const PurchaseForm = () => {
       supplierId: "", purchaseDate: "", reference: "", expectedDate: "",
       orderStatus: "Pending", paymentStatus: "Pending", billingAddress: "",
       shippingAddress: "", items: [{ productId: "", quantityAvailable: 0, quantity: 0, cost: 0, total: 0 }],
-      totalAmount: 0, taxInformation: "", invoiceId: ""
+      totalAmount: 0, taxInformation: "", invoiceId: "",branch:""
     });
     setErrors({});
   };
@@ -169,7 +186,7 @@ const PurchaseForm = () => {
 
     <Fragment>
       <Card className="m-4 p-4">
-        <h4 className="mb-4">Product Form</h4>
+        <h4 className="mb-4">Purchases Form</h4>
 
         <Form onSubmit={handleSubmit} className="">
           <Row className="justify-content-center">
@@ -211,7 +228,19 @@ const PurchaseForm = () => {
             </Col>
           </Row>
           <Row className="justify-content-center">
-            <Col md={4} lg={4} sm={12} className="mb-2">
+          <Col md={6} lg={3} sm={12} className="mb-2">
+              <Label className="form-label" for="branch">Branch</Label>
+              <Select
+                id="branch"
+                name="branch"
+                options={branchesOptions}
+                value={branchesOptions?.find(option => option.value === formData.branch)}
+                onChange={(selected) => setFormData({ ...formData, branch: selected.value })}
+                isInvalid={!!errors.branch}
+              />
+              {errors.branch && <FormFeedback>{errors.branch}</FormFeedback>}
+            </Col>
+            <Col md={6} lg={3} sm={12} className="mb-2">
               <Label className="form-label" for="expectedDate">Expected Date</Label>
               <Input
                 id="expectedDate"
@@ -223,7 +252,7 @@ const PurchaseForm = () => {
               />
               {errors.expectedDate && <FormFeedback>{errors.expectedDate}</FormFeedback>}
             </Col>
-            <Col md={4} lg={4} sm={12} className="mb-2">
+            <Col md={6} lg={3} sm={12} className="mb-2">
               <Label className="form-label" for="orderStatus">Order Status</Label>
               <Input
                 id="orderStatus"
@@ -240,7 +269,7 @@ const PurchaseForm = () => {
               </Input>
               {errors.orderStatus && <FormFeedback>{errors.orderStatus}</FormFeedback>}
             </Col>
-            <Col md={4} lg={4} sm={12} className="mb-2">
+            <Col md={6} lg={3} sm={12} className="mb-2">
               <Label className="form-label" for="paymentStatus">Payment Status</Label>
               <Input
                 id="paymentStatus"
