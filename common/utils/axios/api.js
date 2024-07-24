@@ -14,3 +14,4 @@ export const PaymentsApi = "/payments";
 export const ReceiptsApi = "/receipts";
 export const InventoryAdjustments = "/inventoryAdjustments";
 export const CategoryAPI = "/productCategories";
+export const LoansApi = "/loans";
