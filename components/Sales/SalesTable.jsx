@@ -91,7 +91,26 @@ const SalesTable = () => {
       sortable: true,
       sortField: "status",
       selector: (row) => row?.status,
-      cell: (row) => <div>{row?.status}</div>,
+      cell: (row) => {
+        const getColor = (status) => {
+          switch (status) {
+            case 'pending':
+              return 'warning';
+            case 'completed':
+              return 'success';
+            case 'canceled':
+              return 'danger';
+            default:
+              return 'secondary';
+          }
+        };
+    
+        return (
+          <Badge color={getColor(row?.status)}>
+            <span className="text-capitalize fs-6">{row?.status}</span>
+          </Badge>
+        );
+      }
     },
     {
       name: "Price",

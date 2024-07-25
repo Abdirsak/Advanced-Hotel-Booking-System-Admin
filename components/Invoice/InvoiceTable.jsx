@@ -54,7 +54,7 @@ const EmployeesTable = () => {
       sortable: true,
       sortField: "customerData.fullName",
       selector: (row) => row.customerData?.fullName,
-      cell: (row) => <div className="">{row?.customerData?.fullName ?? ""}</div>,
+      cell: (row) => <div style={{width:"400px"}} className="">{row?.customerData?.fullName ?? ""}</div>,
     },
     {
       name: "Contact",
@@ -88,34 +88,52 @@ const EmployeesTable = () => {
         </span>
       ),
     },
-    {
-      name: "Status",
-      sortable: true,
-      sortField: "status",
-      selector: (row) => row.status,
-      cell: (row) => <div className="">{row?.status ?? ""}</div>,
-    },
+ 
     
     {
-      name: "Amount",
+      name: "Total Amount",
       sortable: true,
       sortField: "totalAmount",
       selector: (row) => row.totalAmount,
       cell: (row) => <div className="">{row?.totalAmount ?? ""}</div>,
     },
- 
     {
-      name: "Created Date",
+      name: "Paid Amount",
       sortable: true,
-      sortField: "createdAt",
-      selector: (row) => row.createdAt,
-      cell: (row) => (
-        <span className="text-capitalize">
-          {" "}
-          {moment(row.createdAt).format("DD-MMM-YYYY")}
-        </span>
-      ),
+      sortField: "paidAmount",
+      selector: (row) => row.paidAmount,
+      cell: (row) => <div className="">{row?.paidAmount ?? ""}</div>,
     },
+    {
+      name: "Balance",
+      sortable: true,
+      sortField: "balance",
+      selector: (row) => row?.balance,
+      cell: (row) => <div className="">{row?.totalAmount - row?.paidAmount  ?? ""}</div>,
+    },
+    {
+      name: "Status",
+      sortable: true,
+      sortField: "status",
+      selector: (row) => row.status,
+      cell: (row) => ( <Badge color={`${row?.status === "unpaid" ? "warning" : "success"}`}>
+      <span className="text-capitalize fs-6">{row?.status}</span>
+    </Badge>
+      )
+    },
+ 
+    // {
+    //   name: "Created Date",
+    //   sortable: true,
+    //   sortField: "createdAt",
+    //   selector: (row) => row.createdAt,
+    //   cell: (row) => (
+    //     <span className="text-capitalize">
+    //       {" "}
+    //       {moment(row.createdAt).format("DD-MMM-YYYY")}
+    //     </span>
+    //   ),
+    // },
 
     {
       name: "Actions",
@@ -159,7 +177,7 @@ const EmployeesTable = () => {
       />
       <Table
         columns={columns}
-        onCreateAction={() => setShowModal(true)}
+        // onCreateAction={() => setShowModal(true)}
         populate={[]}
         query={{}}
         title="Invoices"

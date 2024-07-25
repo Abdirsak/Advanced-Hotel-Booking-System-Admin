@@ -6,12 +6,15 @@ const initialState = {
   userInfo: getUserData(),
 };
 
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
     setCredential: (state, { payload }) => {
       state.userInfo = payload;
+      // console.log(state.userInfo.res)
+      // JSON.stringfy(localStorage.setItem('User',state.userInfo.res))
       Cookies.set("rs-account", JSON.stringify(payload), { expires: 1 });
       window.reload = "/";
     },

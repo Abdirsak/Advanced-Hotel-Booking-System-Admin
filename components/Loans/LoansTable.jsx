@@ -54,7 +54,7 @@ const LoansTable = () => {
       sortable: true,
       sortField: "name",
       selector: (row) => row?.name ?? "",
-      cell: (row) => <div className="">{row?.name ?? ""}</div>,
+      cell: (row) => <div style={{width:"500px"}} className="">{row?.name ?? ""}</div>,
     },
     {
       name: "Gender",
