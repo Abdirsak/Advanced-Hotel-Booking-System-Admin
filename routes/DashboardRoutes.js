@@ -91,22 +91,22 @@ export const DashboardMenu = [
     icon: "layout",
     title: "Inventory Adjustments",
   },
-  {
-    id: uuid(),
-    title: "Transactions",
-    grouptitle: true,
-  },
-  { id: uuid(), link: "/purchases", icon: "layout", title: "Purchases" },
-  { id: uuid(), link: "/sales", icon: "layout", title: "Sales" },
-  { id: uuid(), link: "/invoices", icon: "layout", title: "Invoices" },
-  { id: uuid(), link: "/payments", icon: "layout", title: "Payments" },
-  { id: uuid(), link: "/receipts", icon: "layout", title: "Receipts" },
-  {
-    id: uuid(),
-    link: "/dashboard/expenses",
-    icon: "layout",
-    title: "Expenses",
-  },
+  // {
+  //   id: uuid(),
+  //   title: "Transactions",
+  //   grouptitle: true,
+  // },
+  // { id: uuid(), link: "/purchases", icon: "layout", title: "Purchases" },
+  // { id: uuid(), link: "/sales", icon: "layout", title: "Sales" },
+  // { id: uuid(), link: "/invoices", icon: "layout", title: "Invoices" },
+  // { id: uuid(), link: "/payments", icon: "layout", title: "Payments" },
+  // { id: uuid(), link: "/receipts", icon: "layout", title: "Receipts" },
+  // {
+  //   id: uuid(),
+  //   link: "/dashboard/expenses",
+  //   icon: "layout",
+  //   title: "Expenses",
+  // },
 
   {
     id: uuid(),
@@ -135,7 +135,7 @@ export const DashboardMenu = [
     title: "Reports",
     icon: "home",
     children: [
-      // { id: uuid(), link: "/employees", name: "Employees" },
+      { id: uuid(), link: "/dashboard/reports/lossOrProfit", name: "Loss/Profit" },
       // { id: uuid(), link: "/branches", name: "Branches" },
       // { id: uuid(), link: "/users", name: "Users" },
       // { id: uuid(), link: "/customers", name: "Customers" },
