@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { SuppliersApi, ProductsApi, PurchasesApi } from "common/utils/axios/api";
+import {
+  SuppliersApi,
+  ProductsApi,
+  PurchasesApi,
+} from "common/utils/axios/api";
 import request from "common/utils/axios/index";
 import useCreate from "hooks/useCreate";
 import useUpdate from "hooks/useUpdate";
@@ -59,9 +63,15 @@ const schema = Joi.object({
   supplierId: Joi.string().required().label("Supplier"),
   purchaseDate: Joi.date().required().label("Purchase Date"),
   reference: Joi.string().required().label("Reference No"),
-  expectedDate: Joi.date().required().label("Expected Date"),
-  orderStatus: Joi.string().valid("Pending", "Received", "Processing", "Shipped").required().label("Order Status"),
-  paymentStatus: Joi.string().valid("Paid", "Pending", "Overdue").required().label("Payment Status"),
+  expectedDate: Joi.string().required().label("Expected Date"),
+  orderStatus: Joi.string()
+    .valid("Pending", "Received", "Processing", "Shipped")
+    .required()
+    .label("Order Status"),
+  paymentStatus: Joi.string()
+    .valid("Paid", "Pending", "Overdue")
+    .required()
+    .label("Payment Status"),
   billingAddress: Joi.string().required().label("Billing Address"),
   shippingAddress: Joi.string().required().label("Shipping Address"),
   totalAmount: Joi.number().required().label("Total Amount"),
@@ -69,8 +79,21 @@ const schema = Joi.object({
   invoiceId: Joi.string().required().label("Invoice ID"),
 });
 
-const PurchaseForm = ({ showModal, setShowModal, selectedRow, setSelectedRow }) => {
-  const { control, handleSubmit, register, reset, setValue, getValues, formState: { errors } } = useForm({
+const PurchaseForm = ({
+  showModal,
+  setShowModal,
+  selectedRow,
+  setSelectedRow,
+}) => {
+  const {
+    control,
+    handleSubmit,
+    register,
+    reset,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       supplierId: "",
       purchaseDate: "",
@@ -157,16 +180,24 @@ const PurchaseForm = ({ showModal, setShowModal, selectedRow, setSelectedRow }) 
     }
   };
 
-  const { mutate } = useCreate(PurchasesApi, "Purchase Created Successfully", () => {
-    setShowModal(false);
-    reset();
-  });
+  const { mutate } = useCreate(
+    PurchasesApi,
+    "Purchase Created Successfully",
+    () => {
+      setShowModal(false);
+      reset();
+    }
+  );
 
-  const { mutateUpdate } = useUpdate(PurchasesApi, "Purchase Updated Successfully", () => {
-    setShowModal(false);
-    setSelectedRow(null);
-    reset();
-  });
+  const { mutateUpdate } = useUpdate(
+    PurchasesApi,
+    "Purchase Updated Successfully",
+    () => {
+      setShowModal(false);
+      setSelectedRow(null);
+      reset();
+    }
+  );
 
   return (
     <Modal isOpen={showModal} toggle={handleClose} size="lg">
@@ -380,7 +411,9 @@ const PurchaseForm = ({ showModal, setShowModal, selectedRow, setSelectedRow }) 
                           type="select"
                           {...register(`items[${index}].productId`)}
                           {...field}
-                          onChange={(e) => handleItemChange(index, e.target.value)}
+                          onChange={(e) =>
+                            handleItemChange(index, e.target.value)
+                          }
                         >
                           <option value="">Select Item</option>
                           {productsData?.data?.docs?.map((item) => (
@@ -415,7 +448,9 @@ const PurchaseForm = ({ showModal, setShowModal, selectedRow, setSelectedRow }) 
                           type="number"
                           {...register(`items[${index}].quantity`)}
                           {...field}
-                          onBlur={(e) => handleQuantityChange(index, e.target.value)}
+                          onBlur={(e) =>
+                            handleQuantityChange(index, e.target.value)
+                          }
                         />
                       )}
                     />
@@ -429,7 +464,9 @@ const PurchaseForm = ({ showModal, setShowModal, selectedRow, setSelectedRow }) 
                           type="number"
                           {...register(`items[${index}].cost`)}
                           {...field}
-                          onBlur={(e) => handleCostChange(index, e.target.value)}
+                          onBlur={(e) =>
+                            handleCostChange(index, e.target.value)
+                          }
                         />
                       )}
                     />
