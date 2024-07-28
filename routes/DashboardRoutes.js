@@ -152,7 +152,7 @@ export const DashboardMenu = [
     children: [
       {
         id: uuid(),
-        link: "/settings/compony-profile",
+        link: "/dashboard/settings/company-profile",
         name: "Company Profile",
       },
     ],
