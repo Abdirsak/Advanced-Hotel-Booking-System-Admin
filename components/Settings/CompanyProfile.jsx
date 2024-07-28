@@ -2,7 +2,7 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   Card,
   Col,
@@ -17,6 +17,9 @@ import {
 import * as yup from "yup";
 import { useRouter } from "next/navigation";
 import useCreate from "hooks/useCreate";
+import { CompanyProfileApi } from "common/utils/axios/api";
+import { useQuery } from "@tanstack/react-query";
+import request from "common/utils/axios";
 
 const schema = yup.object().shape({
   name: yup.string().min(2).max(50).required("Name is required"),
@@ -39,8 +42,23 @@ const defaultValues = {
 };
 
 const CompanyInfoForm = () => {
+  const {
+    data,
+    isLoading: loading,
+    refetch,
+  } = useQuery({
+    queryKey: [CompanyProfileApi],
+    queryFn: () =>
+      request({
+        url: CompanyProfileApi,
+        method: "GET",
+      }),
+    select: (res) => res.data,
+  });
+
   const router = useRouter();
   const [imagePreview, setImagePreview] = useState(null);
+  const [file, setFile] = useState(null);
   const {
     handleSubmit,
     control,
@@ -53,7 +71,7 @@ const CompanyInfoForm = () => {
   });
 
   const { mutate, isPending: isLoading } = useCreate(
-    "/api/company-info", // API endpoint to save the company info
+    CompanyProfileApi, // API endpoint to save the company info
     "Company Info Saved Successfully",
     () => {
       onDiscard();
@@ -62,6 +80,7 @@ const CompanyInfoForm = () => {
 
   const onSubmit = (data) => {
     const validation = schema.validate(data, { abortEarly: false });
+
     if (validation.error) {
       const newErrors = {};
       validation.error.details.forEach((err) => {
@@ -79,6 +98,8 @@ const CompanyInfoForm = () => {
       }
     }
 
+    formData.set("logo", file);
+
     mutate(formData);
   };
 
@@ -86,7 +107,7 @@ const CompanyInfoForm = () => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      // setValue("logo", file);
+      setFile(file);
       setImagePreview(reader.result);
     };
   };
@@ -97,8 +118,19 @@ const CompanyInfoForm = () => {
   };
 
   const onDiscard = () => {
-    router.replace("/dashboard");
+    // router.replace("/dashboard");
   };
+
+  useEffect(() => {
+    console.log("uuuu");
+    reset({
+      ...data,
+      logo: "",
+    });
+
+    console.log(data?.logoUrl);
+    setImagePreview(data?.logoUrl);
+  }, [data]);
 
   return (
     <Fragment>

@@ -16,3 +16,4 @@ export const InventoryAdjustments = "/inventoryAdjustments";
 export const CategoryAPI = "/productCategories";
 export const LoansApi = "/loans";
 export const SalesLedgerApi = "/ledger";
+export const CompanyProfileApi = "/settings/company-profile";
