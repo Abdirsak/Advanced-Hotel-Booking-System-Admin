@@ -21,26 +21,6 @@ const LedgerTable = () => {
 
   const router = useRouter();
 
-  // delete function
-  const handleConfirmDelete = async (id, name) => {
-    return Swal.fire({
-      title: `Delete Employee ${name}?`,
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      customClass: {
-        confirmButton: "btn btn-danger",
-        cancelButton: "btn btn-primary ms-1",
-      },
-      buttonsStyling: false,
-    }).then(async (result) => {
-      if (result.value) {
-        mutate(id);
-      }
-    });
-  };
-
   // columns
   const columns = [
     // ... your columns definition here
