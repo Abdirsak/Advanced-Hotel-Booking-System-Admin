@@ -135,7 +135,11 @@ export const DashboardMenu = [
     title: "Reports",
     icon: "home",
     children: [
-      { id: uuid(), link: "/dashboard/reports/lossOrProfit", name: "Loss/Profit" },
+      {
+        id: uuid(),
+        link: "/dashboard/reports/lossOrProfit",
+        name: "Loss/Profit",
+      },
       // { id: uuid(), link: "/branches", name: "Branches" },
       // { id: uuid(), link: "/users", name: "Users" },
       // { id: uuid(), link: "/customers", name: "Customers" },
