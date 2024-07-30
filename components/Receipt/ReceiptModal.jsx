@@ -1,8 +1,7 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import request from "common/utils/axios/index";
-
-// 3rd party packages
+import Select from 'react-select';
 import Joi from "joi";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { joiResolver } from "@hookform/resolvers/joi";
@@ -20,8 +19,6 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-
-// custom packages
 import {
   ReceiptsApi,
   InvoicesApi,
@@ -30,9 +27,8 @@ import {
 import useCreate from "hooks/useCreate";
 import useUpdate from "hooks/useUpdate";
 
-// validation schema
 const schema = Joi.object({
-  customerId: Joi.string().required().label("Customer"),
+  customerId: Joi.any().optional().label("Customer"),
   invoiceId: Joi.string().required().label("Invoice"),
   method: Joi.string()
     .valid("EVC", "CASH", "ACCOUNT")
@@ -54,10 +50,11 @@ const fetchCustomers = async () => {
   return response.data;
 };
 
-const fetchInvoices = async () => {
+const fetchInvoices = async (customerId) => {
+  console.log(customerId)
   const response = await request({
     method: "GET",
-    url: InvoicesApi,
+    url: `${InvoicesApi}/single/${customerId}`,
   });
   return response.data;
 };
@@ -69,15 +66,8 @@ const useCustomers = () => {
   });
 };
 
-const useInvoices = () => {
-  return useQuery({
-    queryKey: "invoices",
-    queryFn: fetchInvoices,
-  });
-};
-
 // component
-const InvoiceModal = ({
+const ReceiptsModal = ({
   showModal,
   setShowModal,
   selectedRow = null,
@@ -85,7 +75,12 @@ const InvoiceModal = ({
 }) => {
   const queryClient = useQueryClient();
   const { data: customerData } = useCustomers();
-  const { data: invoicesData } = useInvoices();
+  const [filteredInvoices, setFilteredInvoices] = useState([]);
+
+  const Customeroptions = customerData?.data?.docs?.map((customer) => ({
+    value: customer._id,
+    label: customer.fullName,
+  }));
 
   const defaultValues = {
     method: "",
@@ -111,10 +106,24 @@ const InvoiceModal = ({
 
   console.log(errors)
   
+  const customerId = useWatch({ control, name: "customerId" });
   const invoiceId = useWatch({ control, name: "invoiceId" });
   const amount = useWatch({ control, name: "amount" });
 
-  const selectedInvoice = invoicesData?.data?.docs?.find(
+  useEffect(() => {
+    if (customerId?.value) {
+      fetchInvoices(customerId.value).then(data => {
+        const invoices = data?.data?.docs?.filter(invoice => 
+          invoice.totalAmount - (invoice.paidAmount || 0) > 0
+        );
+        setFilteredInvoices(invoices);
+      });
+    } else {
+      setFilteredInvoices([]);
+    }
+  }, [customerId]);
+
+  const selectedInvoice = filteredInvoices?.find(
     (invoice) => invoice._id === invoiceId
   );
 
@@ -142,9 +151,18 @@ const InvoiceModal = ({
   );
 
   const onSubmit = (data) => {
-    console.log('Form Data:', data); // Add logging
+    // Check if customerId is selected
+    if (!data.customerId || !data.customerId.value) {
+      setError("customerId", {
+        type: "manual",
+        message: "Customer is required",
+      });
+      return;
+    }
+
     const receiptData = {
       ...data,
+      customerId: data.customerId.value,  // Extract the value from react-select
       balance,
     };
 
@@ -169,7 +187,7 @@ const InvoiceModal = ({
   useEffect(() => {
     if (selectedRow) {
       reset({
-        customerId: selectedRow?.customerId || "",
+        customerId: Customeroptions.find(option => option.value === selectedRow?.customerId) || "",
         invoiceId: selectedRow?.invoiceId || "",
         method: selectedRow?.method || "",
         description: selectedRow?.description || "",
@@ -180,7 +198,7 @@ const InvoiceModal = ({
         reference: selectedRow?.reference || ""
       });
     }
-  }, [selectedRow, reset]);
+  }, [selectedRow, reset, Customeroptions]);
 
   return (
     <Fragment>
@@ -204,23 +222,13 @@ const InvoiceModal = ({
                   name="customerId"
                   control={control}
                   render={({ field }) => (
-                    <Input
+                    <Select
                       id="customer"
-                      type="select"
-                      {...register("customerId")}
-                      invalid={errors.customerId && true}
                       {...field}
-                      defaultValue={
-                        selectedRow ? selectedRow?.customerId : ""
-                      }
-                    >
-                      <option value="">Select Customer</option>
-                      {customerData?.data?.docs?.map((customer) => (
-                        <option key={customer._id} value={customer._id}>
-                          {customer?.fullName}
-                        </option>
-                      ))}
-                    </Input>
+                      options={Customeroptions}
+                      defaultValue={selectedRow ? Customeroptions.find(option => option.value === selectedRow.customerId) : null}
+                      classNamePrefix={errors.customerId ? 'is-invalid' : ''}
+                    />
                   )}
                 />
                 {errors.customerId && (
@@ -325,7 +333,7 @@ const InvoiceModal = ({
             <Row>
               <Col xs={12} md={4} lg={4} className="mb-2">
                 <Label className="form-label" for="invoiceId">
-                  Invoice
+                  Invoice No
                 </Label>
                 <Controller
                   name="invoiceId"
@@ -337,14 +345,12 @@ const InvoiceModal = ({
                       {...register("invoiceId")}
                       invalid={errors.invoiceId && true}
                       {...field}
-                      defaultValue={
-                        selectedRow ? selectedRow?.invoiceId : ""
-                      }
+                      defaultValue={selectedRow ? selectedRow?.invoiceId : ""}
                     >
                       <option value="">Select Invoice</option>
-                      {invoicesData?.data?.docs?.map((invoice) => (
+                      {filteredInvoices?.map((invoice) => (
                         <option key={invoice._id} value={invoice._id}>
-                          {invoice?.reference}
+                          {invoice?.invoiceNo}
                         </option>
                       ))}
                     </Input>
@@ -444,4 +450,4 @@ const InvoiceModal = ({
   );
 };
 
-export default InvoiceModal;
+export default ReceiptsModal;
