@@ -12,8 +12,11 @@ import { ActiveProjects, Teams, TasksPerformance } from "sub-components";
 
 // import required data files
 import ProjectsStatsData from "data/dashboard/ProjectsStatsData";
+import { getUserData } from "common/utils";
 
 const Home = () => {
+  const user = getUserData()
+  console.log("user-------------------------- ",user)
   return (
     <Fragment>
       <div className="bg-primary pt-10 pb-21"></div>

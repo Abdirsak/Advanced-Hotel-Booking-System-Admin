@@ -81,6 +81,7 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
     doc.line(145, finalY + 12, 195, finalY + 12); // Underline G.Total
     doc.line(145, finalY + 22, 195, finalY + 22); // Underline Paid
     doc.line(145, finalY + 32, 195, finalY + 32); // Underline Rest
+    doc.line(145, finalY + 42, 195, finalY + 42); // Underline Rest
     doc.line(10, finalY + 54, 60, finalY + 54); // Underline Authorized Signature
 
     // Add footer
