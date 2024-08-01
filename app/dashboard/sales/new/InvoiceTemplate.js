@@ -73,7 +73,8 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
     doc.setFont("helvetica", "bold");
     doc.text(`G.Total: $${invoiceData.total.toFixed(2)}`, 150, finalY + 10);
     doc.text(`Paid: $${invoiceData.paid.toFixed(2)}`, 150, finalY + 20);
-    doc.text(`Rest: $${(invoiceData.total - invoiceData?.paid)?.toFixed(2)}`, 150, finalY + 30);
+    doc.text(`Discount: $${(invoiceData?.discount)}`, 150, finalY + 30);
+    doc.text(`Rest: $${(invoiceData.total - invoiceData?.paid - invoiceData?.discount)?.toFixed(2)}`, 150, finalY + 40);
 
     // Draw lines
     doc.setLineWidth(0.5);

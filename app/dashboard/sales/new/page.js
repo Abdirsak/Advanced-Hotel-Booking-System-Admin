@@ -650,6 +650,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
            unitPrice: item.price,
          })),
          total: formData.totalAmount,
+         discount: formData.discount,
          paid: parseFloat(formData.paidBalance),
        }} />
       <Card className="m-4 p-4">
