@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import { Fragment, useState, useEffect, useRef } from "react";
 import Select from 'react-select';
 import Joi from "joi";
@@ -16,6 +15,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InvoiceTemplate from "./InvoiceTemplate"; // Import the InvoiceTemplate component
 import { getUserData } from "common/utils";
+
 // Fetch Customers
 const fetchCustomers = async () => {
   const response = await request({
@@ -38,7 +38,7 @@ const fetchProducts = async () => {
 const fetchInvoices = async () => {
   const response = await request({
     method: "GET",
-    url: InvoicesApi,
+    url: `invoices/invoiceNo/last`,
   });
   return response.data;
 };
@@ -96,11 +96,12 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
   
   const { data: customersData } = useCustomers();
   const { data: productsData } = useProducts();
-  const { data: invoicesData } = useInvoices();
+  const { data: lastInvoiceNo } = useInvoices();
   const invoiceTemplateRef = useRef(); // Create a ref for InvoiceTemplate
 
-  const invoiceNo = invoicesData?.data?.docs[invoicesData.data.docs.length - 1]?.invoiceNo + 1 || 1;
+  const nextInvoiceNo = lastInvoiceNo + 1;
 
+  console.log(nextInvoiceNo)
   const { mutate, isPending: isLoading } = useCreate(
     SalesApi, "Sale Created Successfully", () => {
       // Generate the PDF after a successful creation
@@ -152,15 +153,21 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
     updatedsalesItems[index] = { ...item, quantity, total };
     setFormData({ ...formData, salesItems: updatedsalesItems });
     if (quantity > formData.salesItems[0].quantityAvailable) {
-      return toast.error("Quantity can not be greater than Available Quantity")
+      return toast.error("Quantity cannot be greater than Available Quantity")
     }
   };
 
+  const handlePriceChange = (index, price) => {
+    const updatedsalesItems = [...formData.salesItems];
+    const item = updatedsalesItems[index];
+    const total = parseFloat(price) * parseFloat(item.quantity || 0);
+    updatedsalesItems[index] = { ...item, price, total };
+    setFormData({ ...formData, salesItems: updatedsalesItems });
+  };
 
   const userData = getUserData();
-  const branch = userData?.res?.branch
-  const createdBy = userData?.res?._id
-  console.log(userData)
+  const branch = userData?.res?.branch;
+  const createdBy = userData?.res?._id;
 
   useEffect(() => {
     let totalAmount = 0;
@@ -190,13 +197,12 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.totalAmount <= 0) {
-      return toast.error("Discount cannot exceed total amount")
+      return toast.error("Discount cannot exceed total amount");
     }
     const newErrors = validate();
     setErrors(newErrors || {});
     if (newErrors) return;
-    const updatedFormData = { ...formData, invoiceNo,createdBy,branch };
-    console.log(updatedFormData)
+    const updatedFormData = { ...formData, invoiceNo: nextInvoiceNo, createdBy, branch };
     if (selectedRow) {
       mutateUpdate({ id: selectedRow._id, ...updatedFormData });
     } else {
@@ -219,12 +225,12 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
       <InvoiceTemplate ref={invoiceTemplateRef} invoiceData={{
         date: formData.saleDate,
         name: customersOptions?.find(option => option.value === formData.customer)?.label,
-        invoiceNo,
+        invoiceNo: nextInvoiceNo,
         customerTel: customerPhone, // Add the customer's phone number to the invoice template
         items: formData.salesItems.map(item => ({
           description: productsOptions?.find(option => option.value === item.productId)?.label,
           qty: item.quantity,
-          unitPrice: item.price,
+          unitPrice: parseFloat(item.price),
         })),
         total: formData.totalAmount,
         discount: formData.discount,
@@ -330,7 +336,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
                       type="number"
                       name={`salesItems[${index}].price`}
                       value={item.price}
-                      disabled
+                      onChange={(e) => handlePriceChange(index, e.target.value)}
                     />
                   </td>
                   <td>

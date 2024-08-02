@@ -54,9 +54,9 @@ const LossOrProfitTable = () => {
     {
       name: "Invoice No",
       sortable: true,
-      sortField: "invoiceData.reference",
-      selector: (row) => row.invoiceData.reference,
-      cell: (row) => <div>{row.invoiceData.reference}</div>,
+      sortField: "invoiceData.invoiceNo",
+      selector: (row) => row.invoiceData.invoiceNo,
+      cell: (row) => <div>{row.invoiceData.invoiceNo}</div>,
     },
     {
       name: "Product",
@@ -82,9 +82,9 @@ const LossOrProfitTable = () => {
     {
       name: "Sales Price",
       sortable: true,
-      sortField: "productsData?.price",
-      selector: (row) => "$" + row?.productsData?.price,
-      cell: (row) => <div>{"$" + row?.productsData?.price}</div>,
+      sortField: "salesItems?.price",
+      selector: (row) => "$" + row?.salesItems?.price,
+      cell: (row) => <div>{"$" + row?.salesItems?.price}</div>,
     },
     {
       name: "Discount",
@@ -104,8 +104,8 @@ const LossOrProfitTable = () => {
       name: "Sales Cost",
       sortable: true,
       sortField: "salesItems",
-      selector: (row) => row?.salesItems?.quantity * row?.productsData?.price,
-      cell: (row) => <div>{"$" + row?.salesItems?.quantity * row?.productsData?.price}</div>,
+      selector: (row) => row?.salesItems?.quantity * row?.salesItems?.price,
+      cell: (row) => <div>{"$" + row?.salesItems?.quantity * row?.salesItems?.price}</div>,
     },
     {
       name: "Sold",
@@ -119,7 +119,7 @@ const LossOrProfitTable = () => {
       sortable: true,
       sortField: "profit",
       selector: (row) => {
-        const salesCost = row?.salesItems?.quantity * row?.productsData?.price;
+        const salesCost = row?.salesItems?.quantity * row?.salesItems?.price;
         const supplierCost = row?.productsData?.cost * row?.salesItems?.quantity;
         const discount = row?.discount || 0;
         const profit = salesCost - supplierCost - discount;
