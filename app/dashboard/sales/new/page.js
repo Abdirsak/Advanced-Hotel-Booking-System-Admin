@@ -84,8 +84,10 @@ const schema = Joi.object({
 });
 
 const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelectedRow }) => {
+  const DEFAULT_CUSTOMER_ID = "66afa9345769555bd9f53703";
+  
   const [formData, setFormData] = useState({
-    customer: "", saleDate: "", totalAmount: 0, discount: 0, status: "pending",
+    customer: DEFAULT_CUSTOMER_ID, saleDate: "", totalAmount: 0, discount: 0, status: "pending",
     paidBalance: 0, reference: "",
     salesItems: [{ productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }]
   });
@@ -202,6 +204,12 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
     const newErrors = validate();
     setErrors(newErrors || {});
     if (newErrors) return;
+    
+    // Check if customer is not selected, set default customer
+    if (!formData.customer) {
+      setFormData({ ...formData, customer: DEFAULT_CUSTOMER_ID });
+    }
+    
     const updatedFormData = { ...formData, invoiceNo: nextInvoiceNo, createdBy, branch };
     if (selectedRow) {
       mutateUpdate({ id: selectedRow._id, ...updatedFormData });
@@ -212,7 +220,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
 
   const onDiscard = () => {
     setFormData({
-      customer: "", saleDate: "", totalAmount: 0, discount: 0, status: "pending",
+      customer: DEFAULT_CUSTOMER_ID, saleDate: "", totalAmount: 0, discount: 0, status: "pending",
       salesItems: [{ productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }]
     });
     setErrors({});

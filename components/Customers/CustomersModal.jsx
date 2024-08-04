@@ -20,7 +20,7 @@ import {
 } from "reactstrap";
 
 //custom packages
-import { customersApi } from "common/utils/axios/api";
+import { CustomersApi } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
 import useUpdate from "Hooks/useUpdate";
 
@@ -59,7 +59,7 @@ const CustomersModal = ({
   } = useForm({ defaultValues, resolver: joiResolver(schema) });
 
   const { mutate, isPending: isLoading } = useCreate(
-    customersApi,
+    CustomersApi,
     "New Customer Created Successfully",
     () => {
       setShowModal(false);
@@ -67,7 +67,7 @@ const CustomersModal = ({
   );
 
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
-    customersApi,
+    CustomersApi,
     "New Customer Updated Successfully",
     () => {
       setShowModal(false);
