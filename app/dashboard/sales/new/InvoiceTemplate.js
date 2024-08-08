@@ -3,7 +3,6 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 
 const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
-    // console.log("------------------", invoiceData)
   const generatePDF = () => {
     const doc = new jsPDF();
 
@@ -32,6 +31,8 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
     const tableColumn = ["No", "DESCRIPTION", "QTY", "U.Price", "Amount"];
     const tableRows = [];
 
+    let totalDiscount = 0;
+
     invoiceData.items.forEach((item, index) => {
       const rowData = [
         index + 1,
@@ -41,6 +42,7 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
         `$${(item.qty * item.unitPrice)?.toFixed(2)}`,
       ];
       tableRows.push(rowData);
+      totalDiscount += item.discount || 0;
     });
 
     doc.autoTable({
@@ -67,20 +69,19 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
       },
     });
 
-
     // Add totals and lines
     const finalY = doc.lastAutoTable.finalY;
     doc.setFont("helvetica", "bold");
     doc.text(`G.Total: $${invoiceData.total.toFixed(2)}`, 150, finalY + 10);
     doc.text(`Paid: $${invoiceData.paid.toFixed(2)}`, 150, finalY + 20);
-    doc.text(`Discount: $${(invoiceData?.discount)}`, 150, finalY + 30);
-    doc.text(`Rest: $${(invoiceData.total - invoiceData?.paid - invoiceData?.discount)?.toFixed(2)}`, 150, finalY + 40);
+    doc.text(`Discount: $${totalDiscount.toFixed(2)}`, 150, finalY + 30); // Use totalDiscount here
+    doc.text(`Rest: $${(invoiceData.total - invoiceData.paid ).toFixed(2)}`, 150, finalY + 40);
 
     // Draw lines
     doc.setLineWidth(0.5);
     doc.line(145, finalY + 12, 195, finalY + 12); // Underline G.Total
     doc.line(145, finalY + 22, 195, finalY + 22); // Underline Paid
-    doc.line(145, finalY + 32, 195, finalY + 32); // Underline Rest
+    doc.line(145, finalY + 32, 195, finalY + 32); // Underline Discount
     doc.line(145, finalY + 42, 195, finalY + 42); // Underline Rest
     doc.line(10, finalY + 54, 60, finalY + 54); // Underline Authorized Signature
 

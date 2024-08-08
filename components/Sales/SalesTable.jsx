@@ -130,8 +130,8 @@ const SalesTable = () => {
       name: "Paid",
       sortable: true,
       sortField: "totalAmount",
-      selector: (row) => `$${row?.totalAmount}`?? 0,
-      cell: (row) => <div>{`$${row?.totalAmount}` ?? 0}</div>,
+      selector: (row) => "$"+`${row?.salesItems?.total - row?.salesItems?.itemDiscount}` ?? 0,
+      cell: (row) => <div>{"$"+`${row?.salesItems?.total - row?.salesItems?.itemDiscount}` ?? 0}</div>,
     },
     {
       name: "Discount",
