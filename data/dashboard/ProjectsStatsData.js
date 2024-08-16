@@ -6,7 +6,6 @@ import {
   TotalCustomersAPI,
   TotalUsersAPI,
   TotalProfitAPI,
-  
   TotalAmountReceivedAPI,
   TotalReceivableAPI
 } from "common/utils/axios/api";
