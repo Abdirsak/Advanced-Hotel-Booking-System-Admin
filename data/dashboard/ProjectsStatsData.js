@@ -1,9 +1,21 @@
 import { Briefcase, ListTask, People, Bullseye } from "react-bootstrap-icons";
+import {
+  TotalSuppliersAPI,
+  TotalEmployeesAPI,
+  TotalExpensesAPI,
+  TotalCustomersAPI,
+  TotalUsersAPI,
+  TotalProfitAPI,
+  
+  TotalAmountReceivedAPI,
+  TotalReceivableAPI
+} from "common/utils/axios/api";
+
 
 export const ProjectsStats = [
   {
     id: 1,
-    title: "Projects",
+    title: "Total Receivable Amount",
     value: 18,
     icon: <Briefcase size={18} />,
     statInfo: '<span className="text-dark me-2">2</span> Completed',
