@@ -1,15 +1,4 @@
-import { Briefcase, ListTask, People, Bullseye } from "react-bootstrap-icons";
-import {
-  TotalSuppliersAPI,
-  TotalEmployeesAPI,
-  TotalExpensesAPI,
-  TotalCustomersAPI,
-  TotalUsersAPI,
-  TotalProfitAPI,
-  TotalAmountReceivedAPI,
-  TotalReceivableAPI
-} from "common/utils/axios/api";
-
+import { Briefcase, ListTask, People, Bullseye } from "react-bootstrap-icons"
 
 export const ProjectsStats = [
   {
