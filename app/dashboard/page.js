@@ -5,10 +5,20 @@ import Link from "next/link";
 import { Container, Col, Row } from "react-bootstrap";
 import { Briefcase, ListTask, People, Bullseye } from "react-bootstrap-icons";
 import { getUserData,getTotalReceivableAmount,getTotalUsers,getTotalSuppliers,getTotalEmployees,getTotalCustomers,getTotalExpenses,getTotalProfit,getTotalReceivedAmount,getTotalProducts  } from "common/utils";
-
+import { Badge } from "reactstrap";
+import { useQuery } from "@tanstack/react-query";
+import DataTable from "react-data-table-component";
+import { ChevronDown, Plus } from "react-feather";
+import { Button, Card, CardBody } from "reactstrap";
+import request from "common/utils/axios";
 // import widget/custom components
 import { StatRightTopIcon } from "widgets";
+import moment from "moment";
+import Swal from "sweetalert2";
 
+//custom packages
+// import Table from "common/Table";
+import { LastFiveInvoicesAPI } from "common/utils/axios/api";
 // import sub components
 import { ActiveProjects, Teams, TasksPerformance } from "sub-components";
 
@@ -130,22 +140,194 @@ const Home = () => {
         </Row>
 
         {/* Active Projects */}
-        <ActiveProjects />
+        {/* <ActiveProjects />
+         */}
 
-        <Row className="my-6">
+      <LastFiveInvoices /> 
+        {/* <Row className="my-6">
           <Col xl={4} lg={12} md={12} xs={12} className="mb-6 mb-xl-0">
             {/* Tasks Performance */}
-            <TasksPerformance />
+            {/* <TasksPerformance />
           </Col>
           {/* card */}
-          <Col xl={8} lg={12} md={12} xs={12}>
+          {/* <Col xl={8} lg={12} md={12} xs={12}> */}
             {/* Teams */}
-            <Teams />
-          </Col>
-        </Row>
+            {/* <Teams /> */}
+          {/* </Col> */}
+        {/* </Row> */} 
       </Container>
     </Fragment>
   );
 };
 
 export default Home;
+
+
+
+const LastFiveInvoices = ()=>{
+  const columns = [
+    {
+      name: "Customer",
+      sortable: true,
+      sortField: "customerData.fullName",
+      selector: (row) => row.customerData?.fullName,
+      cell: (row) => <div style={{width:"400px"}} className="">{row?.customerData?.fullName ?? ""}</div>,
+    },
+    {
+      name: "Contact",
+      sortable: true,
+      sortField: "customerData.contact",
+      selector: (row) => row.customerData?.contact,
+      cell: (row) => <div className="">{row?.customerData?.contact ?? ""}</div>,
+    },
+    {
+      name: "Invoice Date",
+      sortable: true,
+      sortField: "invoiceDate",
+      selector: (row) => row.invoiceDate,
+      cell: (row) => (
+        <span className="text-capitalize">
+          {" "}
+          {moment(row.invoiceDate).format("DD-MMM-YYYY")}
+        </span>
+      ),
+    },
+
+    
+    {
+      name: "Total Amount",
+      sortable: true,
+      sortField: "totalAmount",
+      selector: (row) => row.totalAmount,
+      cell: (row) => <div className="">{row?.totalAmount ?? ""}</div>,
+    },
+    {
+      name: "Paid Amount",
+      sortable: true,
+      sortField: "paidAmount",
+      selector: (row) => row.paidAmount,
+      cell: (row) => <div className="">{row?.paidAmount ?? ""}</div>,
+    },
+    {
+      name: "Balance",
+      sortable: true,
+      sortField: "balance",
+      selector: (row) => row?.balance,
+      cell: (row) => <div className="">{row?.totalAmount - row?.paidAmount  ?? ""}</div>,
+    },
+    {
+      name: "Status",
+      sortable: true,
+      sortField: "status",
+      selector: (row) => row.status,
+      cell: (row) => ( <Badge color={`${row?.status === "unpaid" ? "warning" : "success"}`}>
+      <span className="text-capitalize fs-6">{row?.status}</span>
+    </Badge>
+      )
+    }
+
+  ];
+  return (
+    <>
+     
+      <Table
+        columns={columns}
+        // onCreateAction={() => setShowModal(true)}
+        populate={[]}
+        query={{}}
+        title="Invoices"
+        url={LastFiveInvoicesAPI}
+        searchFields={["name"]}
+      />
+    </>
+  );
+}
+
+
+
+const Table = ({
+  columns,
+  url,
+  query = null,
+  populate = [],
+}) => {
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState({ createdAt: "desc" });
+
+  const [selectedRows, setSelectedRows] = useState([]);
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: [url, page],
+    queryFn: () =>
+      request({
+        url: url,
+        method: "GET",
+        params: {
+          query,
+          keyword: "",
+          options: {
+            limit: rowsPerPage,
+            page,
+            populate,
+            sort: sortBy,
+          },
+        },
+      }),
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: 1000 * 60 * 60,
+    keepPreviousData: true,
+
+    select: (res) => res.data?.data,
+  });
+
+  useEffect(() => {
+    !isLoading && refetch();
+  }, [page, rowsPerPage, sortBy]);
+
+  const handlePageChange = (page) => setPage(page.selected + 1);
+
+  const handleFilter = (e) => {
+    const value = e.target.value;
+    console.log(value);
+    setSearch(value);
+  };
+
+  const handlePerPage = (e) => {
+    const value = e.target.value;
+    setRowsPerPage(value);
+  };
+
+  useEffect(() => {
+    setPage(1);
+  }, [rowsPerPage]);
+
+  return (
+    <>
+      <Card className="my-5">
+        <div className="react-dataTable my-3">
+          <DataTable
+         
+            striped
+            columns={columns}
+            sortIcon={<ChevronDown />}
+            onSort={(column, direction) => {
+              if (column.sortField) {
+                setSortBy({ [column.sortField]: direction });
+              }
+            }}
+            className="react-dataTable card-company-table"
+            
+       
+            data={data?.docs}
+            progressPending={isLoading}
+        
+          />
+        </div>
+      </Card>
+    </>
+  );
+};

@@ -8,7 +8,8 @@ import {
   TotalProfitAPI,
   TotalProductsAPI,
   TotalAmountReceivedAPI,
-  TotalReceivableAPI
+  TotalReceivableAPI,
+  LastFiveInvoicesAPI
 
   
 } from "common/utils/axios/api";
@@ -70,6 +71,11 @@ export const getTotalSuppliers = async() => {
 };
 export const getTotalProducts = async() => {
   const res = await axios.get(BASE_RUL+TotalProductsAPI)
+  // console.log(res)
+  return res;
+};
+export const getLastFiveInvoices = async() => {
+  const res = await axios.get(BASE_RUL+LastFiveInvoicesAPI)
   // console.log(res)
   return res;
 };
