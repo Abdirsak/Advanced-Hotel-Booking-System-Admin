@@ -4,6 +4,7 @@ export const CustomersApi = "/customers";
 export const ProductCategoryApi = "/productCategories";
 export const ExpenseCategoryApi = "/expenseCategories";
 export const ProductsApi = "/products";
+export const RolesApi = "/roles";
 export const SuppliersApi = "/supplier";
 export const SalesApi = "/sales";
 export const PurchasesApi = "/purchases";

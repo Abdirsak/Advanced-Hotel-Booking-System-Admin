@@ -85,6 +85,12 @@ export const DashboardMenu = [
     icon: "layout",
     title: "Loans",
   },
+  {
+    id: uuid(),
+    link: "/dashboard/roles",
+    icon: "layout",
+    title: "Roles",
+  },
   // {
   //   id: uuid(),
   //   link: "/dashboard/adjustments",
