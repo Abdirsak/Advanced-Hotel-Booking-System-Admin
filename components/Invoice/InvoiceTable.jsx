@@ -15,7 +15,7 @@ import useDelete from "hooks/useDelete";
 
 //
 
-const EmployeesTable = () => {
+const InvoicesTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedInvoice, setselectedInvoice] = useState(null);
   const router = useRouter();
@@ -188,4 +188,4 @@ const EmployeesTable = () => {
   );
 };
 
-export default EmployeesTable;
+export default InvoicesTable;
