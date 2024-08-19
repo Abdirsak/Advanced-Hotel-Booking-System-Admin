@@ -1,18 +1,21 @@
-"use client";
-
-import { Fragment, useState, useEffect } from "react";
+"use client"
+import { Fragment, useState, useEffect, useRef } from "react";
 import Select from 'react-select';
 import Joi from "joi";
 import {
-  Button, Col, Form, FormFeedback, Input, Label, Row, Spinner, Container, Table,Card
+  Button, Col, Form, FormFeedback, Input, Label, Row, Spinner, Table, Card
 } from "reactstrap";
-import { CustomersApi, ProductsApi, SalesApi } from "common/utils/axios/api";
+
+import { CustomersApi, ProductsApi, SalesApi, InvoicesApi } from "common/utils/axios/api";
 import useCreate from "Hooks/useCreate";
 import useUpdate from "Hooks/useUpdate";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import request from "common/utils/axios/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import InvoiceTemplate from "./InvoiceTemplate"; // Import the InvoiceTemplate component
+import { getUserData } from "common/utils";
+
 // Fetch Customers
 const fetchCustomers = async () => {
   const response = await request({
@@ -31,10 +34,26 @@ const fetchProducts = async () => {
   return response.data;
 };
 
+// Fetch invoices
+const fetchInvoices = async () => {
+  const response = await request({
+    method: "GET",
+    url: `invoices/invoiceNo/last`,
+  });
+  return response.data;
+};
+
 const useCustomers = () => {
   return useQuery({
     queryKey: "customers",
     queryFn: fetchCustomers,
+  });
+};
+
+const useInvoices = () => {
+  return useQuery({
+    queryKey: "invoices",
+    queryFn: fetchInvoices,
   });
 };
 
@@ -49,7 +68,7 @@ const schema = Joi.object({
   customer: Joi.string().required().label("Customer"),
   saleDate: Joi.date().required().label("Sale Date"),
   totalAmount: Joi.number().required().label("Total Amount"),
-  discount: Joi.number().optional().allow(0).label("Discount"),
+  discount: Joi.number().allow(null).label("Total Discount"),
   paidBalance: Joi.number().optional().allow(0).label("Paid Balance"),
   status: Joi.string().valid("completed", "pending", "cancelled").required().label("Status"),
   reference: Joi.string().required().label("Reference"),
@@ -59,28 +78,44 @@ const schema = Joi.object({
       quantity: Joi.number().required().label("Quantity"),
       price: Joi.number().required().label("Price"),
       total: Joi.number().required().label("Total"),
+      itemDiscount: Joi.number().optional().allow(0).label("Item Discount"), // Add discount for each item
       quantityAvailable: Joi.number().required().label("Available Quantity"),
     })
   ).required().label("salesItems")
 });
 
-const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelectedRow }) => {
+const SalesFormRegistration = ({ selectedRow, setSelectedRow }) => {
+  const DEFAULT_CUSTOMER_ID = "66afa9345769555bd9f53703";
+  
   const [formData, setFormData] = useState({
-    customer: "", saleDate: "", totalAmount: 0, discount: 0, status: "pending",
-    paidBalance:0,reference:"",
-    salesItems: [{ productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }]
+    customer: DEFAULT_CUSTOMER_ID, saleDate: "", discount:0, totalAmount: 0, paidBalance: 0, status: "pending",
+    reference: "", salesItems: [{ productId: "", quantity: 0, price: 0, total: 0, itemDiscount: 0, quantityAvailable: 0 }]
   });
+  
   const [errors, setErrors] = useState({});
+  // console.log(errors)
+  // console.log(formData)
+  const [customerPhone, setCustomerPhone] = useState(""); // State for customer phone
+  const queryClient = useQueryClient();
+  
   const { data: customersData } = useCustomers();
   const { data: productsData } = useProducts();
+  const { data: lastInvoiceNo } = useInvoices();
+  const invoiceTemplateRef = useRef(); // Create a ref for InvoiceTemplate
+
+  const nextInvoiceNo = lastInvoiceNo + 1;
 
   const { mutate, isPending: isLoading } = useCreate(
-    SalesApi, "Sale Created Successfully", () => { }
+    SalesApi, "Sale Created Successfully", () => {
+      // Generate the PDF after a successful creation
+      invoiceTemplateRef.current.generatePDF();
+      queryClient.invalidateQueries("products"); // Invalidate the products query to refetch the latest products
+    }
   );
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
     SalesApi, "Sale Updated Successfully", () => {
-      setShowModal(false);
       setSelectedRow(null);
+      queryClient.invalidateQueries("products"); // Invalidate the products query to refetch the latest products
     }
   );
 
@@ -92,6 +127,12 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleCustomerChange = (selected) => {
+    const customer = customersData?.data?.docs?.find(c => c._id === selected.value);
+    setCustomerPhone(customer?.contact || ""); // Set the customer phone
+    setFormData({ ...formData, customer: selected.value });
+  };
+
   const handleItemChange = (index, productId) => {
     const selectedItem = productsData?.data?.docs?.find(item => item._id === productId);
     if (selectedItem) {
@@ -101,30 +142,51 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
         productId: selectedItem._id,
         price: selectedItem.price,
         quantityAvailable: selectedItem.quantity,
-        total: updatedsalesItems[index].quantity * selectedItem.price
+        total: (updatedsalesItems[index].quantity * selectedItem.price) - updatedsalesItems[index].itemDiscount
       };
       setFormData({ ...formData, salesItems: updatedsalesItems });
     }
   };
 
   const handleQuantityChange = (index, quantity) => {
-  
     const updatedsalesItems = [...formData.salesItems];
     const item = updatedsalesItems[index];
-    const total = parseFloat(quantity) * parseFloat(item.price || 0);
+    const total = (parseFloat(quantity) * parseFloat(item.price || 0)) - item.itemDiscount;
     updatedsalesItems[index] = { ...item, quantity, total };
     setFormData({ ...formData, salesItems: updatedsalesItems });
-    if(quantity > formData.salesItems[0].quantityAvailable ){
-      return toast.error("Quantity can not be greater than Available Quantity")
-     }
+    if (quantity > formData.salesItems[0].quantityAvailable) {
+      return toast.error("Quantity cannot be greater than Available Quantity")
+    }
   };
+
+  const handlePriceChange = (index, price) => {
+    const updatedsalesItems = [...formData.salesItems];
+    const item = updatedsalesItems[index];
+    const total = (parseFloat(price) * parseFloat(item.quantity || 0)) - item.itemDiscount;
+    updatedsalesItems[index] = { ...item, price, total };
+    setFormData({ ...formData, salesItems: updatedsalesItems });
+  };
+
+  const handleDiscountChange = (index, discount) => {
+    const updatedsalesItems = [...formData.salesItems];
+    const item = updatedsalesItems[index];
+    const total = (parseFloat(item.price) * parseFloat(item.quantity || 0)) - parseFloat(discount);
+    updatedsalesItems[index] = { ...item, itemDiscount: discount, total };
+    setFormData({ ...formData, salesItems: updatedsalesItems });
+  };
+
+  const userData = getUserData();
+  const branch = userData?.res?.branch;
+  const createdBy = userData?.res?._id;
 
   useEffect(() => {
     let totalAmount = 0;
+    let discount = 0;
     formData?.salesItems?.forEach(item => {
       totalAmount += parseFloat(item.total) || 0;
+      discount += parseFloat(item.itemDiscount) || 0;
     });
-    setFormData({ ...formData, totalAmount });
+    setFormData({ ...formData, totalAmount, discount });
   }, [formData.salesItems]);
 
   useEffect(() => {
@@ -146,37 +208,52 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData)
-    // console.log(formData.totalAmount - formData.paidBalance - formData.discount)
-    // return 
-    // if(formData.paidBalance == 0 )
-    if(formData.totalAmount <= 0){
-      return toast.error("Discount cannot exceed total amount")
+    if (formData.totalAmount <= 0) {
+      return toast.error("Discount cannot exceed total amount");
     }
     const newErrors = validate();
     setErrors(newErrors || {});
-    console.log(newErrors)
     if (newErrors) return;
+    
+    // Check if customer is not selected, set default customer
+    if (!formData.customer) {
+      setFormData({ ...formData, customer: DEFAULT_CUSTOMER_ID });
+    }
+    
+    const updatedFormData = { ...formData, invoiceNo: nextInvoiceNo, createdBy, branch, discount: formData.discount };
     if (selectedRow) {
-      mutateUpdate({ id: selectedRow._id, ...formData });
+      mutateUpdate({ id: selectedRow._id, ...updatedFormData });
     } else {
-      mutate(formData);
+      mutate(updatedFormData);
     }
   };
 
   const onDiscard = () => {
     setFormData({
-      customer: "", saleDate: "", totalAmount: 0, discount: 0, status: "pending",
-      salesItems: [{ productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }]
+      customer: DEFAULT_CUSTOMER_ID, saleDate: "", totalAmount: 0, paidBalance: 0, status: "pending",
+      reference: "", salesItems: [{ productId: "", quantity: 0, price: 0, total: 0, itemDiscount: 0, quantityAvailable: 0 }]
     });
     setErrors({});
-    setShowModal(false);
   };
 
   return (
     <Fragment>
-       <ToastContainer />
-
+      <ToastContainer />
+      <InvoiceTemplate ref={invoiceTemplateRef} invoiceData={{
+        date: formData.saleDate,
+        name: customersOptions?.find(option => option.value === formData.customer)?.label,
+        invoiceNo: nextInvoiceNo,
+        customerTel: customerPhone, // Add the customer's phone number to the invoice template
+        items: formData.salesItems.map(item => ({
+          description: productsOptions?.find(option => option.value === item.productId)?.label,
+          qty: item.quantity,
+          unitPrice: parseFloat(item.price),
+          discount: parseFloat(item.itemDiscount), // Include item discount in the invoice template
+        })),
+        total: formData.totalAmount,
+        discount: formData.discount,
+        paid: parseFloat(formData.paidBalance),
+      }} />
       <Card className="m-4 p-4">
         <Form onSubmit={handleSubmit} className="">
           <Row className="justify-content-center">
@@ -187,7 +264,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
                 name="customer"
                 options={customersOptions}
                 value={customersOptions?.find(option => option.value === formData.customer)}
-                onChange={(selected) => setFormData({ ...formData, customer: selected.value })}
+                onChange={handleCustomerChange}
                 isInvalid={!!errors.customer}
               />
               {errors.customer && <FormFeedback>{errors.customer}</FormFeedback>}
@@ -232,6 +309,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
               {errors.reference && <FormFeedback>{errors.reference}</FormFeedback>}
             </Col>
           </Row>
+       
           <Table responsive>
             <thead>
               <tr>
@@ -239,6 +317,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
                 <th>Quantity Available</th>
                 <th>Quantity</th>
                 <th>Rate</th>
+                <th>Discount</th>
                 <th>Amount</th>
                 <th>Actions</th>
               </tr>
@@ -276,7 +355,15 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
                       type="number"
                       name={`salesItems[${index}].price`}
                       value={item.price}
-                      disabled
+                      onChange={(e) => handlePriceChange(index, e.target.value)}
+                    />
+                  </td>
+                  <td>
+                    <Input
+                      type="number"
+                      name={`salesItems[${index}].itemDiscount`}
+                      value={item.itemDiscount}
+                      onChange={(e) => handleDiscountChange(index, e.target.value)}
                     />
                   </td>
                   <td>
@@ -298,11 +385,11 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
                 </tr>
               ))}
               <tr>
-                <td colSpan="5"></td>
+                <td colSpan="6"></td>
                 <td className="px-4">
                   <Button
                     color="success"
-                    onClick={() => setFormData({ ...formData, salesItems: [...formData.salesItems, { productId: "", quantity: 0, price: 0, total: 0, quantityAvailable: 0 }] })}
+                    onClick={() => setFormData({ ...formData, salesItems: [...formData.salesItems, { productId: "", quantity: 0, price: 0, total: 0, itemDiscount: 0, quantityAvailable: 0 }] })}
                   >
                     Add Item
                   </Button>
@@ -336,12 +423,12 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
               />
             </Col>
             <Col md={3}>
-              <Label for="discount">Discount</Label>
+              <Label for="discount">Total Discount</Label>
               <Input
                 type="number"
                 name="discount"
                 value={formData.discount}
-                onChange={handleInputChange}
+                disabled // Make this field read-only
               />
             </Col>
             <Col md={3}>
@@ -350,7 +437,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
                 type="number"
                 name="paidBalance"
                 placeholder="Enter Paid Balance"
-                value={formData.paidBalance }
+                value={formData.paidBalance}
                 onChange={handleInputChange}
               />
             </Col>
@@ -359,7 +446,7 @@ const SalesFormRegistration = ({ showModal, setShowModal, selectedRow, setSelect
               <Input
                 type="number"
                 name="balance"
-                value={(formData.totalAmount - (formData.discount || 0) - (formData.paidBalance || 0)).toFixed(2)}
+                value={(formData.totalAmount - (formData.paidBalance || 0)).toFixed(2)}
                 disabled
               />
             </Col>

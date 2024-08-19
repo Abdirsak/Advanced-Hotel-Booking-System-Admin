@@ -1,7 +1,7 @@
 import { Fragment, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import request from "common/utils/axios/index";
-
+import { getUserData } from "common/utils";
 // 3rd party packages
 import Joi from "joi";
 import { Controller, useForm } from "react-hook-form";
@@ -94,9 +94,13 @@ const CategoryModal = ({
       reset(defaultValues);
     }
   );
-
+  const userData = getUserData();
+  const branch = userData?.res?.branch
+  const createdBy = userData?.res?._id
+  // console.log(userData)
   const onSubmit = (data) => {
     console.log("data is :", data);
+    const updatedData = { ...data,branch };
     if (selectedRow) {
       mutateUpdate({ data, updateId: selectedRow?._id });
     } else {

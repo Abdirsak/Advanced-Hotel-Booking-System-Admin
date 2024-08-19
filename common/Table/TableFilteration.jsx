@@ -43,7 +43,7 @@ const TableFiltration = ({
     queryKey: [url, page, debouncedSearch, startDate, endDate, rowsPerPage, sortBy],
     queryFn: () =>
       request({
-        url: url,
+        url: url+`/${startDate}/${endDate}`,
         method: "GET",
         params: {
           query,
