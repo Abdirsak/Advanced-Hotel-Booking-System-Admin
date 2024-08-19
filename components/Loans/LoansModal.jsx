@@ -1,5 +1,5 @@
 import { Fragment, useEffect } from "react";
-
+import { getUserData } from "common/utils";
 //3rd party packages
 import Joi from "joi";
 import { Controller, useForm } from "react-hook-form";
@@ -92,13 +92,18 @@ const LoansModal = ({
     { value: "UAE", label: "UAE" },
     // Add other countries as needed
   ];
+  const userData = getUserData();
+  const branch = userData?.res?.branch
+  const createdBy = userData?.res?._id
+  // console.log(userData)
   const onSubmit = (data) => {
-    console.log(data);
+    // console.log(data);
+    const updatedData= { ...data,createdBy,branch };
     if (selectedRow) {
-      mutateUpdate({ data, updateId: selectedRow?._id });
+      mutateUpdate({ updatedData, updateId: selectedRow?._id });
     } else {
       // console.log(data)
-      mutate(data);
+      mutate(updatedData);
     }
   };
 

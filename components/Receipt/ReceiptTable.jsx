@@ -117,12 +117,12 @@ const ReceiptsTable = () => {
     {
       name: "Sale Date",
       sortable: true,
-      sortField: "salesData.createdAt",
-      selector: (row) => row.salesData.createdAt,
+      sortField: "createdAt",
+      selector: (row) => row.salesData.saleDate,
       cell: (row) => (
         <span className="text-capitalize">
           {" "}
-          {moment(row.salesData.createdAt).format("DD-MMM-YYYY")}
+          {moment(row.salesData.saleDate).format("DD-MMM-YYYY")}
         </span>
       ),
     },

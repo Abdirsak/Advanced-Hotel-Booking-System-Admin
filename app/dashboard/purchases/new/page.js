@@ -11,7 +11,7 @@ import useCreate from "hooks/useCreate";
 import useUpdate from "hooks/useUpdate";
 import { useQuery } from "@tanstack/react-query";
 import request from "common/utils/axios/index";
-
+import { getUserData } from "common/utils";
 // Fetch Suppliers
 const fetchSuppliers = async () => {
   const response = await request({
@@ -162,14 +162,19 @@ const PurchaseForm = () => {
     return newErrors;
   };
 
+  const userData = getUserData();
+  const branch = userData?.res?.branch
+  const createdBy = userData?.res?._id
+  console.log(userData)
   const handleSubmit = (e) => {
     e.preventDefault();
     // console.log(formData)
+    const updatedFormData= { ...formData,createdBy };
     const newErrors = validate();
     setErrors(newErrors || {});
     // console.log(newErrors)
     if (newErrors) return;
-    mutate(formData);
+    mutate(updatedFormData);
   };
 
   const onDiscard = () => {
