@@ -165,6 +165,11 @@ export const DashboardMenu = [
         link: "/dashboard/settings/company-profile",
         name: "Company Profile",
       },
+      {
+        id: uuid(),
+        link: "/dashboard/settings/menus",
+        name: "Menus",
+      },
     ],
   },
 
