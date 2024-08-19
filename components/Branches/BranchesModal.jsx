@@ -35,12 +35,12 @@ const schema = Joi.object({
     from: Joi.string().required().label("From"),
     to: Joi.string().required().label("To"),
   }).required(),
-  director: Joi.string().required().label("Director")
+  director: Joi.string().required().label("Director"),
 });
 
 const fetchEmployees = async () => {
   const response = await request({
-    method: 'GET',
+    method: "GET",
     url: EmployeesApi,
   });
   return response.data;
@@ -48,7 +48,7 @@ const fetchEmployees = async () => {
 
 const useEmployees = () => {
   return useQuery({
-    queryKey: 'employees',
+    queryKey: "employees",
     queryFn: fetchEmployees,
   });
 };
@@ -71,7 +71,7 @@ const BranchesModal = ({
       from: selectedRow?.workingHours?.from || "",
       to: selectedRow?.workingHours?.to || "",
     },
-    director: selectedRow?.director?._id || ""
+    director: selectedRow?.director?._id || "",
   };
 
   const {
@@ -87,20 +87,18 @@ const BranchesModal = ({
   const { mutate, isPending: isLoading } = useCreate(
     BranchesApi,
     "Branch Created Successfully",
-    
+
     () => {
-        setShowModal(false);
-      }
-    
+      setShowModal(false);
+    }
   );
 
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
     BranchesApi,
     "Branch Updated Successfully",
-  () => {
-        setShowModal(false);
-        setSelectedRow(null);
-      
+    () => {
+      setShowModal(false);
+      setSelectedRow(null);
     }
   );
 
@@ -116,8 +114,8 @@ const BranchesModal = ({
     clearErrors();
     reset();
     setShowModal(false);
-    setSelectedRow(null)
-    setSelectedRow(defaultValues)
+    setSelectedRow(null);
+    setSelectedRow(defaultValues);
     setSelectedRow && setSelectedRow();
   };
 
@@ -143,7 +141,12 @@ const BranchesModal = ({
 
   return (
     <Fragment>
-      <Modal isOpen={showModal} onClosed={onDiscard} toggle={toggleModal} size="lg">
+      <Modal
+        isOpen={showModal}
+        onClosed={onDiscard}
+        toggle={toggleModal}
+        size="lg"
+      >
         <Form onSubmit={handleSubmit(onSubmit)}>
           <ModalHeader toggle={toggleModal} className="bg-white">
             {!selectedRow ? "New Branch" : "Update Branch"}
@@ -231,7 +234,9 @@ const BranchesModal = ({
                   )}
                 />
                 {errors.workingHours?.from && (
-                  <FormFeedback>{errors.workingHours.from.message}</FormFeedback>
+                  <FormFeedback>
+                    {errors.workingHours.from.message}
+                  </FormFeedback>
                 )}
               </Col>
               <Col xs={4} className="mb-2">
@@ -269,7 +274,9 @@ const BranchesModal = ({
                       {...register("director")}
                       invalid={errors.director && true}
                       {...field}
-                      defaultValue={selectedRow ? selectedRow?.director?._id : ""}
+                      defaultValue={
+                        selectedRow ? selectedRow?.director?._id : ""
+                      }
                     >
                       <option value="">Select Director</option>
                       {employeesData?.data?.docs?.map((employee) => (
