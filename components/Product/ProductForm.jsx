@@ -181,7 +181,7 @@ const ProductsRegistrationForm = ({ id = null }) => {
       ...data,
       expireDate: new Date(data.expireDate),
       branch,
-      createdBy // Convert to Date object
+      createdBy
     };
 
     if (id) {
