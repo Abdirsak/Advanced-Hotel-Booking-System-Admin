@@ -1,3 +1,4 @@
+"use client";
 // import node module libraries
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -37,7 +38,7 @@ const img = {
 export const DropFiles = (props) => {
 	const [files, setFiles] = useState([]);
 	const { getRootProps, getInputProps } = useDropzone({
-		accept: {'image/*': ['.jpeg', '.jpg', '.png']},
+		accept: { 'image/*': ['.jpeg', '.jpg', '.png'] },
 		onDrop: (acceptedFiles) => {
 			setFiles(
 				acceptedFiles.map((file) =>
