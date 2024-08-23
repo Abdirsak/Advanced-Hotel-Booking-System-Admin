@@ -18,7 +18,6 @@ const LossOrProfitTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedSales, setSelectedSales] = useState(null);
 
-
   const router = useRouter();
 
   // delete function
@@ -98,14 +97,18 @@ const LossOrProfitTable = () => {
       sortable: true,
       sortField: "salesItems",
       selector: (row) => row?.productsData?.cost * row?.salesItems?.quantity,
-      cell: (row) => <div>{"$" + row?.productsData?.cost * row?.salesItems?.quantity}</div>,
+      cell: (row) => (
+        <div>{"$" + row?.productsData?.cost * row?.salesItems?.quantity}</div>
+      ),
     },
     {
       name: "Sales Cost",
       sortable: true,
       sortField: "salesItems",
       selector: (row) => row?.salesItems?.quantity * row?.salesItems?.price,
-      cell: (row) => <div>{"$" + row?.salesItems?.quantity * row?.salesItems?.price}</div>,
+      cell: (row) => (
+        <div>{"$" + row?.salesItems?.quantity * row?.salesItems?.price}</div>
+      ),
     },
     {
       name: "Sold",
@@ -120,14 +123,16 @@ const LossOrProfitTable = () => {
       sortField: "profit",
       selector: (row) => {
         const salesCost = row?.salesItems?.quantity * row?.salesItems?.price;
-        const supplierCost = row?.productsData?.cost * row?.salesItems?.quantity;
+        const supplierCost =
+          row?.productsData?.cost * row?.salesItems?.quantity;
         const discount = row?.discount || 0;
         const profit = salesCost - supplierCost - discount;
         return profit;
       },
       cell: (row) => {
         const salesCost = row?.salesItems?.quantity * row?.productsData?.price;
-        const supplierCost = row?.productsData?.cost * row?.salesItems?.quantity;
+        const supplierCost =
+          row?.productsData?.cost * row?.salesItems?.quantity;
         const discount = row?.discount || 0;
         const profit = salesCost - supplierCost - discount;
         return <div>{"$" + profit}</div>;
@@ -135,11 +140,8 @@ const LossOrProfitTable = () => {
     },
   ];
 
- 
-
   return (
     <>
-    
       <Table
         columns={columns}
         // onCreateAction={() => router.push("/dashboard/sales/new")}
