@@ -3,10 +3,54 @@
 
 import React from "react";
 import { Button, Input, Row, Col } from "reactstrap";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import config from "../../../../config";
 
-const ExportButtons = ({ onSearch }) => {
+const ExportButtons = ({ onSearch, columns, tableData }) => {
   const handleExportPDF = () => {
-    console.log("Exporting to PDF...");
+    const doc = new jsPDF();
+
+    const { companyLogoBase64, companyName } = config;
+    doc.addImage(companyLogoBase64, "PNG", 10, 10, 30, 30);
+    doc.setFontSize(18);
+    doc.text(companyName, doc.internal.pageSize.getWidth() / 2, 20, {
+      align: "center",
+    });
+
+    doc.setFontSize(11);
+    doc.text(
+      `Printed on: ${new Date().toLocaleDateString()}`,
+      doc.internal.pageSize.getWidth() - 50,
+      20
+    );
+
+    const tableColumns = columns.map((col) => ({
+      header: col.name,
+      dataKey: col.name,
+    }));
+
+    const tableRows = tableData.map((row) => {
+      return columns.map((col) => col.selector(row));
+    });
+
+    doc.autoTable({
+      head: [tableColumns.map((col) => col.header)],
+      body: tableRows,
+      startY: 40,
+      margin: { top: 40 },
+      theme: "striped",
+      styles: {
+        halign: "left",
+        valign: "middle",
+      },
+      headStyles: {
+        fillColor: "#0070C0",
+        textColor: "#ffffff",
+      },
+    });
+
+    doc.save("sales_report.pdf");
   };
 
   const handleExportExcel = () => {
@@ -24,11 +68,11 @@ const ExportButtons = ({ onSearch }) => {
           type="text"
           placeholder="Search..."
           onChange={handleSearchChange}
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
         />
       </Col>
       <Col md={2}>
-        <Button color="danger" onClick={handleExportPDF} className="w-100">
+        <Button color="primary" onClick={handleExportPDF} className="w-100">
           Save as PDF
         </Button>
       </Col>
