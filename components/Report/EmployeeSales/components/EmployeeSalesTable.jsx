@@ -16,8 +16,8 @@ const EmployeeSalesTable = ({ data }) => {
       sortable: true,
     },
     {
-      name: "Total Sales",
-      selector: (row) => row.totalSales,
+      name: "Total Amount",
+      selector: (row) => row.totalAmount,
       sortable: true,
     },
     {
