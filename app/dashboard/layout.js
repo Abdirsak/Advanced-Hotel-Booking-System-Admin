@@ -8,9 +8,32 @@ import "styles/theme.scss";
 // import sub components
 import NavbarVertical from "/layouts/navbars/NavbarVertical";
 import NavbarTop from "/layouts/navbars/NavbarTop";
+import { CompanyProfileApi } from "common/utils/axios/api";
+import { useQuery } from "@tanstack/react-query";
+import request from "common/utils/axios";
+
+const fetchCompanyProfile = async () => {
+  const response = await request({
+    method: "GET",
+    url: CompanyProfileApi,
+  });
+  return response.data;
+};
+
+const useCompanyProfile = () => {
+  return useQuery({
+    queryKey: "company-profile",
+    queryFn: fetchCompanyProfile,
+  });
+};
 
 export default function DashboardLayout({ children }) {
   const [showMenu, setShowMenu] = useState(true);
+
+  const { data } = useCompanyProfile();
+
+  console.log(data);
+
   const ToggleMenu = () => {
     return setShowMenu(!showMenu);
   };
@@ -21,6 +44,7 @@ export default function DashboardLayout({ children }) {
         <NavbarVertical
           showMenu={showMenu}
           onClick={(value) => setShowMenu(value)}
+          settings={data}
         />
       </div>
       <div id="page-content">

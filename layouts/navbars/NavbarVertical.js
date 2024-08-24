@@ -19,6 +19,7 @@ import { DashboardMenu } from "routes/DashboardRoutes";
 const NavbarVertical = (props) => {
   const router = useRouter();
   const location = usePathname();
+  const { settings } = props;
 
   const handleMouseEnter = (item) => {
     router.prefetch(item.link); // Prefetch the page
@@ -99,8 +100,19 @@ const NavbarVertical = (props) => {
     <Fragment>
       <SimpleBar style={{ maxHeight: "100vh" }}>
         <div className="nav-scroller">
-          <Link href="/" className="navbar-brand">
-            <Image src="/images/brand/logo/logo.svg" alt="" />
+          <Link
+            href="/"
+            className="navbar-brand d-flex align-items-center gap-2"
+          >
+            <Image
+              src={`${
+                settings
+                  ? process.env.NEXT_PUBLIC_UPLOADS + settings.logo
+                  : "/images/brand/logo/logo.svg"
+              }`}
+              alt=""
+            />
+            {settings && <h4 className="text-white">{settings.name}</h4>}
           </Link>
         </div>
         {/* Dashboard Menu */}

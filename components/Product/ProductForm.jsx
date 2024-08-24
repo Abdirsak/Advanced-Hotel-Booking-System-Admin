@@ -28,7 +28,7 @@ import {
   Spinner,
 } from "reactstrap";
 import * as yup from "yup";
-
+import { getUserData } from "common/utils";
 const fetchSuppliers = async () => {
   const response = await request({
     method: "GET",
@@ -147,6 +147,10 @@ const ProductsRegistrationForm = ({ id = null }) => {
     }
   );
 
+  const userData = getUserData();
+  const branch = userData?.res?.branch
+  const createdBy = userData?.res?._id
+  console.log(userData)
   useEffect(() => {
     if (id) {
       // Fetch product details and populate form
@@ -175,7 +179,9 @@ const ProductsRegistrationForm = ({ id = null }) => {
     // Convert expireDate to the appropriate date format
     const formattedData = {
       ...data,
-      expireDate: new Date(data.expireDate), // Convert to Date object
+      expireDate: new Date(data.expireDate),
+      branch,
+      createdBy
     };
 
     if (id) {

@@ -39,11 +39,12 @@ const PurchaseReport = () => {
          cell: (row) => <div>{row.invoiceData.reference}</div>,
       },
       {
+
          name: "Supplier",
          sortable: true,
-         sortField: "supplierData?.fullName",
-         selector: (row) => row?.supplierData?.fullName,
-         cell: (row) => <div>{row?.supplierData?.fullName}</div>,
+         sortField: "supplierData?.SupplierName",
+         selector: (row) => row?.supplierData?.SupplierName,
+         cell: (row) => <div>{row?.supplierData?.SupplierName}</div>,
       },
       {
          name: "Product",
@@ -107,15 +108,15 @@ const PurchaseReport = () => {
    return (
       <>
 
-         <Table
+         {/* <Table
             columns={columns}
             // onCreateAction={() => router.push("/dashboard/sales/new")}
             populate={[]}
             query={{}}
-            title="Sales Ledger"
-            url="/sales/ledger"
+            title="Purchase Report"
+            url="/purchases"
             searchFields={["name"]}
-         />
+         /> */}
       </>
    );
 };
