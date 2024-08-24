@@ -108,7 +108,7 @@ const PurchaseReport = () => {
    return (
       <>
 
-         {/* <Table
+         <Table
             columns={columns}
             // onCreateAction={() => router.push("/dashboard/sales/new")}
             populate={[]}
@@ -116,7 +116,7 @@ const PurchaseReport = () => {
             title="Purchase Report"
             url="/purchases"
             searchFields={["name"]}
-         /> */}
+         />
       </>
    );
 };
