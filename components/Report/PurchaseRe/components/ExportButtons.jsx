@@ -6,9 +6,11 @@ import { Button, Input, Row, Col } from "reactstrap";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import config from "../../../../config";
+import moment from "moment";
 import * as XLSX from 'xlsx';
 
 const ExportButtons = ({ onSearch, columns, tableData }) => {
+
   const handleExportPDF = () => {
     const doc = new jsPDF();
 
@@ -26,13 +28,23 @@ const ExportButtons = ({ onSearch, columns, tableData }) => {
       20
     );
 
+    // Map the columns correctly using the existing definition
     const tableColumns = columns.map((col) => ({
       header: col.name,
-      dataKey: col.name,
+      dataKey: col.sortField || col.name, // Use sortField if available for uniqueness
     }));
 
+    // Define the rows for the table data using the selectors
     const tableRows = tableData.map((row) => {
-      return columns.map((col) => col.selector(row));
+      return columns.map((col) => {
+        if (col.name === "Purchase Date") {
+          return moment(row.purchaseDate).format("DD-MM-YYYY"); // Format Purchase Date
+        } else if (col.name === "Total Amount") {
+          return `$${row.totalAmountSpent.toFixed(2)}`; // Format Total Amount
+        } else {
+          return col.selector(row); // Use existing selector
+        }
+      });
     });
 
     doc.autoTable({
@@ -51,37 +63,39 @@ const ExportButtons = ({ onSearch, columns, tableData }) => {
       },
     });
 
-    doc.save("Employee_report.pdf");
+    doc.save("Purchase_report.pdf");
   };
 
   const handleExportExcel = () => {
-    const { companyLogoBase64, companyName } = config;
-
-    // Create a new workbook
-    const wb = XLSX.utils.book_new();
-
-    // Prepare data for the worksheet
-    const wsData = [
-      // [companyName], // Company Name
-      // [`Printed on: ${new Date().toLocaleDateString()}`], // Date
-      // [] // Empty row
-    ];
-
-    // Add table headers
-    wsData.push(columns.map((col) => col.name));
-
-    // Add table rows
-    tableData.forEach(row => {
-      wsData.push(columns.map(col => col.selector(row)));
+    // Define the data to export
+    const exportData = tableData.map((row) => {
+      // Create an object that matches the columns structure
+      const rowData = {};
+      columns.forEach((col) => {
+        if (col.name === "Purchase Date") {
+          rowData[col.name] = moment(row.purchaseDate).format("DD-MM-YYYY");
+        } else if (col.name === "Total Amount") {
+          rowData[col.name] = `$${row.totalAmountSpent.toFixed(2)}`;
+        } else {
+          rowData[col.name] = col.selector(row);
+        }
+      });
+      return rowData;
     });
 
-    // Create a worksheet and append it to the workbook
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    XLSX.utils.book_append_sheet(wb, ws, "Employee Report");
+    // Define the columns headers based on the columns array
+    const headers = columns.map((col) => col.name);
 
-    // Save the workbook
-    XLSX.writeFile(wb, "Employee_report.xlsx");
+    // Convert JSON data to a worksheet
+    const worksheet = XLSX.utils.json_to_sheet(exportData, { header: headers });
 
+    // Create a new workbook and append the worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales Report');
+
+    // Export the workbook to a file
+    XLSX.writeFile(workbook, 'Purchase_report.xlsx');
+    console.log("Exporting to Excel...");
   };
 
   const handleSearchChange = (e) => {

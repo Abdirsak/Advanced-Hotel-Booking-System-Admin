@@ -1,8 +1,8 @@
-import PurchaseReport from "components/Report/PurchasesRe";
+import PurchaseReport from "components/Report/PurchaseRe";
 import React from "react";
 import "react-toastify/dist/ReactToastify.css";
 const page = () => {
-   return <PurchaseReport />;
+  return <PurchaseReport />;
 };
 
 export default page;
