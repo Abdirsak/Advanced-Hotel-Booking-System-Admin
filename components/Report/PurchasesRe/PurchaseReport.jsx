@@ -110,7 +110,6 @@ const PurchaseReport = () => {
 
          <Table
             columns={columns}
-            // onCreateAction={() => router.push("/dashboard/sales/new")}
             populate={[]}
             query={{}}
             title="Purchase Report"
