@@ -32,7 +32,7 @@ export default function DashboardLayout({ children }) {
 
   const { data } = useCompanyProfile();
 
-  console.log(data);
+  // console.log(data);
 
   const ToggleMenu = () => {
     return setShowMenu(!showMenu);

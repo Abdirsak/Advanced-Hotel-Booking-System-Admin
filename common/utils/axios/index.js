@@ -4,19 +4,25 @@ import { getCookie } from "cookies-next";
 const client = axios.create({
   baseURL: process.env.NEXT_PUBLIC_ENDPOINT,
   headers: {
-    Authorization: `Bearer ${getCookie("token")}`,
     Accept: "application/json",
   },
 });
 
+client.interceptors.request.use((config) => {
+  const token = getCookie("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 const request = async (options) => {
   try {
-    // client.defaults.headers.common.Authorization = `Bearer ${getToken()}`;
-    const onSuccess = (response) => response;
-
     const response = await client(options);
-    return onSuccess(response);
+    console.log("response: ", response);
+    return response;
   } catch (error) {
+    console.error("API request failed: ", error);
     throw error;
   }
 };
