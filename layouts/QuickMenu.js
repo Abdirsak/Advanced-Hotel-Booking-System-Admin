@@ -28,6 +28,8 @@ const QuickMenu = () => {
   const logout = async () => {
     dispatch(logOut());
     deleteCookie("token", { path: "/" });
+    localStorage.removeItem("user")
+    localStorage.removeItem("token")
     router.replace("/auth/login");
     window.location.reload(); // Force page reload after logout
   };

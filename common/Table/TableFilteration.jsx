@@ -25,8 +25,8 @@ const TableFiltration = ({
   onCreateAction,
   query = null,
   filters = {
-    startDate: moment().startOf("year").startOf("day").toDate(), // Start of current year at 00:00
-    endDate: moment().endOf("year").endOf("day").toDate(), // End of current year at 00:00
+    startDate: moment().startOf("month").startOf("day").toDate(), // Start of current month at 00:00
+    endDate: moment().endOf("month").endOf("day").toDate(), // End of current year at 00:00
   },
   populate = [],
   searchFields = [],
