@@ -15,14 +15,13 @@ import request from "common/utils/axios";
 import { StatRightTopIcon } from "widgets";
 import moment from "moment";
 import Swal from "sweetalert2";
-
 //custom packages
 // import Table from "common/Table";
 import { LastFiveInvoicesAPI } from "common/utils/axios/api";
 // import sub components
-import { ActiveProjects, Teams, TasksPerformance } from "sub-components";
 
 const Home = () => {
+  const [token, setToken] = useState(null);
   const [receivables, setReceivables] = useState('');
   const [received, setReceived] = useState('');
   const [profit, setProfit] = useState('');
@@ -33,36 +32,45 @@ const Home = () => {
   const [suppliers, setSuppliers] = useState('');
   const [products, setProducts] = useState('');
 
+  // First useEffect to set the token
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const totalReceivable = await getTotalReceivableAmount();
-        setReceivables(totalReceivable);
-        const totalReceived = await getTotalReceivedAmount();
-        setReceived(totalReceived);
-        const totalProfit = await getTotalProfit();
-        setProfit(totalProfit);
-        const totalExpenses = await getTotalExpenses();
-        setExpenses(totalExpenses);
-
-        const totalCustomers = await getTotalCustomers();
-        setCustomers(totalCustomers);
-        const totalEmployees = await getTotalEmployees();
-        setEmployees(totalEmployees);
-
-        const totalSuppliers = await getTotalSuppliers();
-        setSuppliers(totalSuppliers);
-        const TotalUsers = await getTotalUsers();
-        setUsers(TotalUsers);
-        const TotalProducts = await getTotalProducts();
-        setProducts(TotalProducts);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
+    const fetchedToken = localStorage.getItem("token");
+    setToken(fetchedToken);
   }, []);
+
+  // Second useEffect to fetch data, depends on the token
+  useEffect(() => {
+    if (token) {
+      const fetchData = async () => {
+        try {
+          const totalReceivable = await getTotalReceivableAmount(token);
+          setReceivables(totalReceivable);
+          const totalReceived = await getTotalReceivedAmount(token);
+          setReceived(totalReceived);
+          const totalProfit = await getTotalProfit(token);
+          setProfit(totalProfit);
+          const totalExpenses = await getTotalExpenses(token);
+          setExpenses(totalExpenses);
+
+          const totalCustomers = await getTotalCustomers(token);
+          setCustomers(totalCustomers);
+          const totalEmployees = await getTotalEmployees(token);
+          setEmployees(totalEmployees);
+
+          const totalSuppliers = await getTotalSuppliers(token);
+          setSuppliers(totalSuppliers);
+          const TotalUsers = await getTotalUsers(token);
+          setUsers(TotalUsers);
+          const TotalProducts = await getTotalProducts(token);
+          setProducts(TotalProducts);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+
+      fetchData();
+    }
+  }, [token]);
 
   // console.log(receivables?.data?.total)
   const formatCurrency = (amount) => {
