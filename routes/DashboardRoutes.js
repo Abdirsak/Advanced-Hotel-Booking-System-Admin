@@ -156,6 +156,11 @@ export const DashboardMenu = [
         link: "/dashboard/reports/employeeSales",
         name: "Employee Sales",
       },
+      {
+        id: uuid(),
+        link: "/dashboard/reports/loansReport",
+        name: "LoansReport",
+      },
       { id: uuid(), link: "/dashboard/reports/ledger", name: "Sales Ledger" },
       { id: uuid(), link: "/dashboard/reports/purchase", name: "Purchase Report" },
       // { id: uuid(), link: "/branches", name: "Branches" },
