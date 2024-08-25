@@ -6,7 +6,6 @@ const initialState = {
   userInfo: getUserData(),
 };
 
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
