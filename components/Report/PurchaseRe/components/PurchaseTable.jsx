@@ -5,7 +5,7 @@ import DataTable from "react-data-table-component";
 import moment from "moment";
 import { Badge } from "react-bootstrap";
 
-const EmployeeSalesTable = ({ data }) => {
+const PurchaseTable = ({ data }) => {
   const columns = [
     {
       name: "Purchase Date",
@@ -62,4 +62,4 @@ const EmployeeSalesTable = ({ data }) => {
   );
 };
 
-export default EmployeeSalesTable;
+export default PurchaseTable;

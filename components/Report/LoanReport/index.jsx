@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
 import DateFilter from "./components/DateFilter";
-import PurchaseTable from "./components/PurchaseTable";
+
 import ExportButtons from "./components/ExportButtons";
 import {
   Card,
@@ -15,49 +15,90 @@ import {
 } from "reactstrap";
 import { useQuery } from "@tanstack/react-query"; // Importing useQuery from react-query
 import request from "common/utils/axios";
+import LoanTable from "./components/LoanTable";
 
 const columns = [
   {
-    name: "Purchase Date",
+    name: "Name",
     sortable: true,
-    selector: (row) => row.purchaseDate,
+    sortField: "name",
+    selector: (row) => row?.name ?? "",
+    cell: (row) => <div style={{ width: "500px" }} className="">{row?.name ?? ""}</div>,
+  },
+  {
+    name: "Gender",
+    sortable: true,
+    sortField: "gender",
+    selector: (row) => row?.gender ?? "",
+    cell: (row) => <div className="">{row?.gender ?? ""}</div>,
+  },
+  {
+    name: "Phone",
+    sortable: true,
+    sortField: "contact",
+    selector: (row) => row?.contact ?? "",
+    cell: (row) => <div className="">{row?.contact ?? ""}</div>,
+  },
 
+  {
+    name: "Amount",
+    sortable: true,
+    sortField: "amount",
+    selector: (row) => row?.amount ?? "",
+    cell: (row) => <div className="">{row?.amount ?? ""}</div>,
   },
   {
-    name: "Supplier",
+    name: "Returned Amount",
     sortable: true,
-    sortField: "supplierName",
-    selector: (row) => row.supplierName,
-    cell: (row) => <div>{row.supplierName}</div>,
+    sortField: "returnedAmount",
+    selector: (row) => row?.returnedAmount ?? "",
+    cell: (row) => <div className="">{row?.returnedAmount ?? ""}</div>,
   },
   {
-    name: "Total Amount",
+    name: "Status",
     sortable: true,
-    sortField: "totalAmount",
-    selector: (row) => row?.totalAmount,
-    cell: (row) => <div>{"$" + row.totalAmountSpent?.toFixed(2)}</div>,
+    sortField: "status",
+    selector: (row) => row?.status ?? "",
+    cell: (row) => <div className="">{row?.status ?? ""}</div>,
+  },
+
+  {
+    name: "StartDate Date",
+    sortable: true,
+    sortField: "startDate",
+    selector: (row) => row.startDate,
+    cell: (row) => (
+      <span className="text-capitalize">
+        {" "}
+        {moment(row.startDate).format("DD-MMM-YYYY")}
+      </span>
+    ),
   },
   {
-    name: "Purchase Count",
+    name: "End Date",
     sortable: true,
-    sortField: "purchaseCount",
-    selector: (row) => row.purchaseCount,
-    cell: (row) => <div>{row.purchaseCount || 0}</div>,
+    sortField: "endDate",
+    selector: (row) => row.endDate,
+    cell: (row) => (
+      <span className="text-capitalize">
+        {" "}
+        {moment(row.endDate).format("DD-MMM-YYYY")}
+      </span>
+    ),
   },
-  // {
-  //   name: "Status",
-  //   sortable: true,
-  //   sortField: "orderStatus",
-  //   selector: (row) => row.orderStatus,
-  //   cell: (row) => (
-  //     <Badge color={row.orderStatus === "Pending" ? "warning" : "success"}>
-  //       <span className="text-capitalize fs-6">{row.orderStatus}</span>
-  //     </Badge>
-  //   ),
-  // },
+  {
+    name: "Description",
+    sortable: true,
+    sortField: "description",
+    selector: (row) => row?.description,
+    cell: (row) => <div className="">{row?.description ?? ""}</div>,
+  },
+
+
+
 ];
 
-const PurchaseReport = () => {
+const LoansReport = () => {
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -68,14 +109,14 @@ const PurchaseReport = () => {
 
   // Fetching data using react-query
   const {
-    data: Purchase = [],
+    data: Loans = [],
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["/reports/purchase-report"],
+    queryKey: ["/reports/loans-report"],
     queryFn: () =>
       request({
-        url: "/reports/purchase-report",
+        url: "/reports/loans-report",
         method: "GET",
         params: {},
         options: {
@@ -92,8 +133,8 @@ const PurchaseReport = () => {
 
   // Apply initial data to filteredData
   useEffect(() => {
-    setFilteredData(Purchase);
-  }, [Purchase]);
+    setFilteredData(Loans);
+  }, [Loans]);
 
   // Refetch data on filter change
   useEffect(() => {
@@ -102,11 +143,11 @@ const PurchaseReport = () => {
 
   // Filter data by date and search term
   const filterData = () => {
-    const filtered = Purchase.filter((entry) => {
+    const filtered = Loans.filter((entry) => {
       const isWithinDateRange =
-        (!startDate || entry.purchaseDate >= startDate) &&
+        (!startDate || entry.LoansDate >= startDate) &&
         (!endDate || entry.purchaseDate <= endDate);
-      const matchesSearchTerm = entry.supplierName
+      const matchesSearchTerm = entry.Name
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
       return isWithinDateRange && matchesSearchTerm;
@@ -130,15 +171,16 @@ const PurchaseReport = () => {
     <Container className="mt-5">
       <Card>
         <CardHeader>
-          <h3 className="mb-4">Purchase Report</h3>
+          <h3 className="mb-4">Loans Report</h3>
         </CardHeader>
         <CardBody>
-          <DateFilter onFilter={filterDataByDate} />
+
           <ExportButtons
             onSearch={handleSearch}
             columns={columns}
             tableData={filteredData}
           />
+          <DateFilter onFilter={filterDataByDate} />
           {isLoading ? (
             <div
               className="d-flex justify-content-center align-items-center"
@@ -152,7 +194,7 @@ const PurchaseReport = () => {
               </Spinner>
             </div>
           ) : (
-            <PurchaseTable data={filteredData} />
+            <LoanTable data={filteredData} />
           )}
         </CardBody>
       </Card>
@@ -160,4 +202,4 @@ const PurchaseReport = () => {
   );
 };
 
-export default PurchaseReport;
+export default LoansReport;
