@@ -82,11 +82,11 @@ const LedgerTable = () => {
       cell: (row) => <div>{"$" + row?.invoiceData?.paidAmount}</div>
     },
     {
-      name: "Bakance",
+      name: "Balance",
       sortable: true,
       sortField: "balance",
-      selector: (row) => "$" + ( row?.invoiceData?.totalAmount - row?.invoiceData?.paidAmount),
-      cell: (row) => <div>{"$" + ( row?.invoiceData?.totalAmount - row?.invoiceData?.paidAmount)}</div>
+      selector: (row) => "$" + (row?.invoiceData?.totalAmount - row?.invoiceData?.paidAmount),
+      cell: (row) => <div>{"$" + (row?.invoiceData?.totalAmount - row?.invoiceData?.paidAmount)}</div>
     },
     {
       name: "Status",
@@ -100,14 +100,14 @@ const LedgerTable = () => {
         </Badge>
       ),
     },
- 
+
   ];
 
- 
+
 
   return (
     <>
-    
+
       <Table
         columns={columns}
         // onCreateAction={() => router.push("/dashboard/sales/new")}

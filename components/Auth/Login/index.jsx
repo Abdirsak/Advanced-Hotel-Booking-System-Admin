@@ -46,6 +46,10 @@ const LoginPage = () => {
       if (res.status) {
         dispatch(setCredential({ res: res?.data, router }));
         setCookie("token", res.token, { path: "/" });
+        const token = "Bearer "+res.token
+        localStorage.setItem("token", token)
+        localStorage.setItem("user", JSON.stringify(res?.data))
+        
         toast.success(res.message);
         window.location.href = "/dashboard"; // Force page reload after successful login
       } else {
