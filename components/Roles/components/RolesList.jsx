@@ -76,7 +76,7 @@ const RolesList = () => {
         </CardHeader>
         <CardBody>
           <Row>
-            {roles?.data?.docs?.map((role, index) => (
+            {roles?.data?.map((role, index) => (
               <Col key={index} sm="6" md="4" lg="3">
                 <RolesCard role={role} />
               </Col>
