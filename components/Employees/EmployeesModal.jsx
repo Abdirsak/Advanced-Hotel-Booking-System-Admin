@@ -22,7 +22,7 @@ import {
 } from "reactstrap";
 
 // custom packages
-import { EmployeesApi, UsersAPI,BranchesApi } from "common/utils/axios/api";
+import { EmployeesApi } from "common/utils/axios/api";
 import useCreate from "hooks/useCreate";
 import useUpdate from "hooks/useUpdate";
 
@@ -30,73 +30,30 @@ import useUpdate from "hooks/useUpdate";
 const schema = Joi.object({
   fullName: Joi.string().min(2).max(50).required().label("Full Name"),
   dateOfBirth: Joi.date().required().label("Date of Birth"),
-  gender: Joi.string().valid("Male", "Female", "Other").required().label("Gender"),
+  gender: Joi.string()
+    .valid("Male", "Female", "Other")
+    .required()
+    .label("Gender"),
   contact: Joi.string().required().label("Contact"),
   address: Joi.string().required().label("Address"),
   position: Joi.string().required().label("Position"),
-  department: Joi.string().required().label("Department"),
   hiringDate: Joi.date().required().label("Hiring Date"),
   salary: Joi.number().required().label("Salary"),
   emergencyContact: Joi.string().required().label("Emergency Contact"),
-  user: Joi.string().allow(null).label("User"),
-  branch: Joi.string().allow(null).label("Branch")
 });
-
-const fetchUsers = async () => {
-  const response = await request({
-    method: 'GET',
-    url: UsersAPI,
-  });
-  return response.data;
-};
-const fetchBranches = async () => {
-  const response = await request({
-    method: 'GET',
-    url: BranchesApi,
-  });
-  return response.data;
-};
 
 const fetchEmployees = async () => {
   const response = await request({
-    method: 'GET',
+    method: "GET",
     url: EmployeesApi,
   });
   return response.data;
 };
 
-const useUsers = () => {
-  return useQuery({
-    queryKey: 'users',
-    queryFn: fetchUsers,
-  });
-};
-const useBranches = () => {
-  return useQuery({
-    queryKey: 'branches',
-    queryFn: fetchBranches,
-  });
-};
-
-const useEmployees = () => {
-  return useQuery({
-    queryKey: 'employees',
-    queryFn: fetchEmployees,
-  });
-};
-
 const positions = [
-  { value: "Developer", label: "Developer" },
-  { value: "Manager", label: "Manager" },
-  { value: "Designer", label: "Designer" },
-  // Add other positions as needed
-];
-
-const departments = [
-  { value: "IT", label: "IT" },
-  { value: "HR", label: "HR" },
-  { value: "Marketing", label: "Marketing" },
-  // Add other departments as needed
+  { value: "cleaner", label: "Cleaner" },
+  { value: "reception", label: "Reception" },
+  { value: "guard", label: "Guard" },
 ];
 
 // component
@@ -107,9 +64,7 @@ const EmployeeModal = ({
   setSelectedRow,
 }) => {
   const queryClient = useQueryClient();
-  const { data: usersData } = useUsers();
-  const { data: branchesData } = useBranches();
-  console.log(selectedRow)
+
   const defaultValues = {
     fullName: "",
     dateOfBirth: "",
@@ -117,12 +72,9 @@ const EmployeeModal = ({
     contact: "",
     address: "",
     position: "",
-    department: "",
     hiringDate: "",
     salary: "",
     emergencyContact: "",
-    user: null,
-    branch:null
   };
 
   const {
@@ -138,20 +90,20 @@ const EmployeeModal = ({
   const { mutate, isPending: isLoading } = useCreate(
     EmployeesApi,
     "Employee Created Successfully",
-     () => {
-        setShowModal(false);
-        reset(defaultValues);
+    () => {
+      setShowModal(false);
+      reset(defaultValues);
     }
   );
 
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
     EmployeesApi,
     "Employee Updated Successfully",
-     () => {
-        setShowModal(false);
-        setSelectedRow(null);
-        reset(defaultValues);
-      }
+    () => {
+      setShowModal(false);
+      setSelectedRow(null);
+      reset(defaultValues);
+    }
   );
 
   const onSubmit = (data) => {
@@ -182,26 +134,28 @@ const EmployeeModal = ({
         contact: selectedRow?.contact || "",
         address: selectedRow?.address || "",
         position: selectedRow?.position || "",
-        department: selectedRow?.department || "",
         hiringDate: selectedRow?.hiringDate?.split("T")[0] || "" || "",
         salary: selectedRow?.salary || "",
         emergencyContact: selectedRow?.emergencyContact || "",
-        user: selectedRow?.user?._id || null,
-        branch: selectedRow?.branch?._id || null,
       });
     }
   }, [selectedRow, reset]);
 
   return (
     <Fragment>
-      <Modal isOpen={showModal} onClosed={onDiscard} toggle={toggleModal} size="lg">
+      <Modal
+        isOpen={showModal}
+        onClosed={onDiscard}
+        toggle={toggleModal}
+        size="lg"
+      >
         <Form onSubmit={handleSubmit(onSubmit)}>
           <ModalHeader toggle={toggleModal} className="bg-white">
             {!selectedRow ? "New Employee" : "Update Employee"}
           </ModalHeader>
           <ModalBody>
-            <Row className="justify-content-center">
-              <Col xs={12} md={12} lg={5} className="mb-2">
+            <Row className="">
+              <Col xs={12} md={12} lg={6} className="mb-2">
                 <Label className="form-label" for="fullName">
                   Full Name
                 </Label>
@@ -222,8 +176,8 @@ const EmployeeModal = ({
                   <FormFeedback>{errors.fullName.message}</FormFeedback>
                 )}
               </Col>
-             
-              <Col xs={12} md={6} lg={3} className="mb-2">
+
+              <Col xs={12} md={6} lg={6} className="mb-2">
                 <Label className="form-label" for="gender">
                   Gender
                 </Label>
@@ -248,7 +202,7 @@ const EmployeeModal = ({
                   <FormFeedback>{errors.gender.message}</FormFeedback>
                 )}
               </Col>
-              <Col xs={12} md={6} lg={4} className="mb-2">
+              <Col xs={12} md={6} lg={6} className="mb-2">
                 <Label className="form-label" for="dateOfBirth">
                   Date of Birth
                 </Label>
@@ -270,10 +224,8 @@ const EmployeeModal = ({
                   <FormFeedback>{errors.dateOfBirth.message}</FormFeedback>
                 )}
               </Col>
-              </Row>
-              <Row>
-             
-              <Col xs={12} md={6} lg={4} className="mb-2">
+
+              <Col xs={12} md={6} lg={6} className="mb-2">
                 <Label className="form-label" for="contact">
                   Contact
                 </Label>
@@ -294,7 +246,7 @@ const EmployeeModal = ({
                   <FormFeedback>{errors.contact.message}</FormFeedback>
                 )}
               </Col>
-              <Col xs={12} md={6} lg={4} className="mb-2">
+              <Col xs={12} md={6} lg={6} className="mb-2">
                 <Label className="form-label" for="emergencyContact">
                   Emergency Contact
                 </Label>
@@ -315,106 +267,75 @@ const EmployeeModal = ({
                   <FormFeedback>{errors.emergencyContact.message}</FormFeedback>
                 )}
               </Col>
-              <Col xs={12} md={12} lg={4} className="mb-2">
-      <Label className="form-label" for="address">
-        Address
-      </Label>
-      <Controller
-        name="address"
-        control={control}
-        render={({ field }) => (
-          <Input
-            id="address"
-            placeholder="Address"
-            {...register("address")}
-            invalid={errors.address && true}
-            {...field}
-          />
-        )}
-      />
-      {errors.address && (
-        <FormFeedback>{errors.address.message}</FormFeedback>
-      )}
-    </Col>
-              </Row>
-              <Row>
-              <Col xs={12} md={6} lg={4} className="mb-2">
-                <Label className="form-label" for="branch">
-                  Branch
+              <Col xs={12} md={12} lg={6} className="mb-2">
+                <Label className="form-label" for="address">
+                  Address
                 </Label>
                 <Controller
-                  name="branch"
+                  name="address"
                   control={control}
                   render={({ field }) => (
                     <Input
-                      id="branch"
-                      type="select"
-                      {...register("branch")}
-                      invalid={errors.branch && true}
+                      id="address"
+                      placeholder="Address"
+                      {...register("address")}
+                      invalid={errors.address && true}
                       {...field}
-                      defaultValue={selectedRow ? selectedRow?.branch?._id : ""}
-                    >
-                      <option value="">Select Branch</option>
-                      {branchesData?.data?.docs?.map((branch) => (
-                        <option key={branch._id} value={branch._id}>
-                          {branch?.name}
-                        </option>
-                      ))}
-                    </Input>
+                    />
                   )}
                 />
-                {errors.branch && (
-                  <FormFeedback>{errors.branch.message}</FormFeedback>
+                {errors.address && (
+                  <FormFeedback>{errors.address.message}</FormFeedback>
                 )}
               </Col>
- 
-    <Col xs={12} md={6} lg={4} className="mb-2">
-      <Label className="form-label" for="hiringDate">
-        Hiring Date
-      </Label>
-      <Controller
-        name="hiringDate"
-        control={control}
-        render={({ field }) => (
-          <Input
-            id="hiringDate"
-            type="date"
-            placeholder="Hiring Date"
-            {...register("hiringDate")}
-            invalid={errors.hiringDate && true}
-            {...field}
-          />
-        )}
-      />
-      {errors.hiringDate && (
-        <FormFeedback>{errors.hiringDate.message}</FormFeedback>
-      )}
-    </Col>
-    <Col xs={12} md={6} lg={4} className="mb-2">
-      <Label className="form-label" for="salary">
-        Salary
-      </Label>
-      <Controller
-        name="salary"
-        control={control}
-        render={({ field }) => (
-          <Input
-            id="salary"
-            type="number"
-            placeholder="Salary"
-            {...register("salary")}
-            invalid={errors.salary && true}
-            {...field}
-          />
-        )}
-      />
-      {errors.salary && (
-        <FormFeedback>{errors.salary.message}</FormFeedback>
-      )}
-    </Col>
-  </Row>
-              <Row>
-              <Col xs={12} md={6} lg={4} className="mb-2">
+
+              <Col xs={12} md={6} lg={6} className="mb-2">
+                <Label className="form-label" for="hiringDate">
+                  Hiring Date
+                </Label>
+                <Controller
+                  name="hiringDate"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="hiringDate"
+                      type="date"
+                      placeholder="Hiring Date"
+                      {...register("hiringDate")}
+                      invalid={errors.hiringDate && true}
+                      {...field}
+                    />
+                  )}
+                />
+                {errors.hiringDate && (
+                  <FormFeedback>{errors.hiringDate.message}</FormFeedback>
+                )}
+              </Col>
+              <Col xs={12} md={6} lg={6} className="mb-2">
+                <Label className="form-label" for="salary">
+                  Salary
+                </Label>
+                <Controller
+                  name="salary"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="salary"
+                      type="number"
+                      placeholder="Salary"
+                      {...register("salary")}
+                      invalid={errors.salary && true}
+                      {...field}
+                    />
+                  )}
+                />
+                {errors.salary && (
+                  <FormFeedback>{errors.salary.message}</FormFeedback>
+                )}
+              </Col>
+            </Row>
+            <Row>
+              <Col xs={12} md={6} lg={6} className="mb-2">
                 <Label className="form-label" for="position">
                   Position
                 </Label>
@@ -440,64 +361,6 @@ const EmployeeModal = ({
                 />
                 {errors.position && (
                   <FormFeedback>{errors.position.message}</FormFeedback>
-                )}
-              </Col>
-              <Col xs={12} md={6} lg={4} className="mb-2">
-                <Label className="form-label" for="department">
-                  Department
-                </Label>
-                <Controller
-                  name="department"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="department"
-                      type="select"
-                      {...register("department")}
-                      invalid={errors.department && true}
-                      {...field}
-                    >
-                      <option value="">Select Department</option>
-                      {departments.map((dept) => (
-                        <option key={dept.value} value={dept.value}>
-                          {dept.label}
-                        </option>
-                      ))}
-                    </Input>
-                  )}
-                />
-                {errors.department && (
-                  <FormFeedback>{errors.department.message}</FormFeedback>
-                )}
-              </Col>
-             
-              <Col xs={12} md={12} lg={4} className="mb-2">
-                <Label className="form-label" for="user">
-                  User
-                </Label>
-                <Controller
-                  name="user"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="user"
-                      type="select"
-                      {...register("user")}
-                      invalid={errors.user && true}
-                      {...field}
-                      defaultValue={selectedRow ? selectedRow?.user?._id : ""}
-                    >
-                      <option value="">Select User</option>
-                      {usersData?.data?.docs?.map((user) => (
-                        <option key={user._id} value={user._id}>
-                          {user?.fullName}
-                        </option>
-                      ))}
-                    </Input>
-                  )}
-                />
-                {errors.user && (
-                  <FormFeedback>{errors.user.message}</FormFeedback>
                 )}
               </Col>
             </Row>

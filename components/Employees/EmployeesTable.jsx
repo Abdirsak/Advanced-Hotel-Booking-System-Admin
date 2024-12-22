@@ -93,13 +93,6 @@ const EmployeesTable = () => {
       cell: (row) => <div className="">{row?.salary ?? ""}</div>,
     },
     {
-      name: "Department",
-      sortable: true,
-      sortField: "department",
-      selector: (row) => row?.department,
-      cell: (row) => <div className="">{row?.department ?? ""}</div>,
-    },
-    {
       name: "Position",
       sortable: true,
       sortField: "position",
