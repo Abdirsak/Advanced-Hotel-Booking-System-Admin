@@ -21,6 +21,8 @@ import {
   Spinner,
 } from "reactstrap";
 
+import { RolesApi } from "common/utils/axios/api";
+
 // custom packages
 import { EmployeesApi } from "common/utils/axios/api";
 import useCreate from "hooks/useCreate";
@@ -29,6 +31,8 @@ import useUpdate from "hooks/useUpdate";
 // validation schema
 const schema = Joi.object({
   fullName: Joi.string().min(2).max(50).required().label("Full Name"),
+  username: Joi.string().min(3).max(30).required().label("Username"),
+  password: Joi.string().min(6).required().label("Password"),
   dateOfBirth: Joi.date().required().label("Date of Birth"),
   gender: Joi.string()
     .valid("Male", "Female", "Other")
@@ -39,13 +43,14 @@ const schema = Joi.object({
   position: Joi.string().required().label("Position"),
   hiringDate: Joi.date().required().label("Hiring Date"),
   salary: Joi.number().required().label("Salary"),
+  role: Joi.string().allow(null).label("Role"),
   emergencyContact: Joi.string().required().label("Emergency Contact"),
 });
 
-const fetchEmployees = async () => {
+const fetchRoles = async () => {
   const response = await request({
-    method: "GET",
-    url: EmployeesApi,
+    method: 'GET',
+    url: RolesApi,
   });
   return response.data;
 };
@@ -56,6 +61,13 @@ const positions = [
   { value: "guard", label: "Guard" },
 ];
 
+const useRoles = () => {
+  return useQuery({
+    queryKey: 'roles',
+    queryFn: fetchRoles,
+  });
+};
+
 // component
 const EmployeeModal = ({
   showModal,
@@ -65,8 +77,12 @@ const EmployeeModal = ({
 }) => {
   const queryClient = useQueryClient();
 
+  const { data: rolesData } = useRoles();
+
   const defaultValues = {
     fullName: "",
+    username: "",
+    password: "",
     dateOfBirth: "",
     gender: "",
     contact: "",
@@ -74,6 +90,7 @@ const EmployeeModal = ({
     position: "",
     hiringDate: "",
     salary: "",
+    role: null,
     emergencyContact: "",
   };
 
@@ -95,6 +112,8 @@ const EmployeeModal = ({
       reset(defaultValues);
     }
   );
+
+  console.log("Errors : ",errors)
 
   const { mutate: mutateUpdate, isPending: updateLoading } = useUpdate(
     EmployeesApi,
@@ -129,6 +148,8 @@ const EmployeeModal = ({
     if (selectedRow) {
       reset({
         fullName: selectedRow?.fullName || "",
+        username: selectedRow?.username || "",
+        password: selectedRow?.password || "",
         dateOfBirth: selectedRow?.dateOfBirth?.split("T")[0] || "" || "",
         gender: selectedRow?.gender || "",
         contact: selectedRow?.contact || "",
@@ -136,6 +157,7 @@ const EmployeeModal = ({
         position: selectedRow?.position || "",
         hiringDate: selectedRow?.hiringDate?.split("T")[0] || "" || "",
         salary: selectedRow?.salary || "",
+        role: selectedRow?.role?._id || null,
         emergencyContact: selectedRow?.emergencyContact || "",
       });
     }
@@ -333,6 +355,63 @@ const EmployeeModal = ({
                   <FormFeedback>{errors.salary.message}</FormFeedback>
                 )}
               </Col>
+
+              <Col xs={12} md={6} lg={6} className="mb-2">
+                <Label className="form-label" for="username">
+                  Username
+                </Label>
+                <Controller
+                  name="username"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="username"
+                      placeholder="Username"
+                      {...register("username")}
+                      invalid={errors.username && true}
+                      {...field}
+                    />
+                  )}
+                />
+                {errors.username && (
+                  <FormFeedback>{errors.username.message}</FormFeedback>
+                )}
+              </Col>
+
+              <Col xs={12} md={6} lg={6} className="mb-2">
+                <Label className="form-label" for="password">
+                  Password
+                </Label>
+                <div className="d-flex">
+                  <Controller
+                    name="password"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        id="password"
+                        placeholder="Password"
+                        type="text"
+                        {...register("password")}
+                        invalid={errors.password && true}
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Button
+                    color="primary"
+                    className="ms-1"
+                    onClick={() => {
+                      const generated = Math.random().toString(36).slice(-6);
+                      reset({ ...control._formValues, password: generated });
+                    }}
+                  >
+                    Generate
+                  </Button>
+                </div>
+                {errors.password && (
+                  <FormFeedback>{errors.password.message}</FormFeedback>
+                )}
+              </Col>
             </Row>
             <Row>
               <Col xs={12} md={6} lg={6} className="mb-2">
@@ -361,6 +440,35 @@ const EmployeeModal = ({
                 />
                 {errors.position && (
                   <FormFeedback>{errors.position.message}</FormFeedback>
+                )}
+              </Col>
+              <Col xs={12} md={12} lg={6} className="mb-2">
+                <Label className="form-label" for="role">
+                  Role
+                </Label>
+                <Controller
+                  name="role"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="role"
+                      type="select"
+                      {...register("role")}
+                      invalid={errors.role && true}
+                      {...field}
+                      defaultValue={selectedRow ? selectedRow?.role?._id : ""}
+                    >
+                      <option value="">Select Role</option>
+                      {rolesData?.data?.map((role) => (
+                        <option key={role._id} value={role._id}>
+                          {role?.name}
+                        </option>
+                      ))}
+                    </Input>
+                  )}
+                />
+                {errors.role && (
+                  <FormFeedback>{errors.role.message}</FormFeedback>
                 )}
               </Col>
             </Row>
