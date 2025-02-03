@@ -126,7 +126,7 @@ const CustomersModal = ({
       >
         <Form onSubmit={handleSubmit(onSubmit)}>
           <ModalHeader toggle={toggleModal} className="bg-white">
-            {!selectedRow ? "New Supplier" : "Update Supplier"}
+            {!selectedRow ? "New Customer" : "Update Customer"}
           </ModalHeader>
           <ModalBody>
             <Row className="justify-content-center">

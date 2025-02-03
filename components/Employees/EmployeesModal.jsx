@@ -157,7 +157,7 @@ const EmployeeModal = ({
         position: selectedRow?.position || "",
         hiringDate: selectedRow?.hiringDate?.split("T")[0] || "" || "",
         salary: selectedRow?.salary || "",
-        role: selectedRow?.role?._id || null,
+        role: selectedRow?.role || null,
         emergencyContact: selectedRow?.emergencyContact || "",
       });
     }
@@ -456,7 +456,7 @@ const EmployeeModal = ({
                       {...register("role")}
                       invalid={errors.role && true}
                       {...field}
-                      defaultValue={selectedRow ? selectedRow?.role?._id : ""}
+                      defaultValue={selectedRow ? selectedRow?.role : ""}
                     >
                       <option value="">Select Role</option>
                       {rolesData?.data?.map((role) => (
