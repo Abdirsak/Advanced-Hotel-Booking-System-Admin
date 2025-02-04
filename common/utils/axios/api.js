@@ -30,5 +30,5 @@ export const TotalEmployeesAPI = "/reports/employees";
 export const TotalUsersAPI = "/reports/users";
 export const TotalProductsAPI = "/reports/products";
 export const LoanReportAPI = "/reports/loans-report";
-export const LastFiveInvoicesAPI = "/reports/invoices";
+// export const LastFiveInvoicesAPI = "/reports/invoices";
 export const EmployeeSalesReportAPI = "/reports/employee-sales"

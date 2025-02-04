@@ -44,6 +44,7 @@ export const DashboardMenu = [
   { id: uuid(), link: "/dashboard/customers", icon: "user-check", title: "Customers", name: "Customers" },
   { id: uuid(), link: "/dashboard/rooms", icon: "users", title: "Rooms", name: "Rooms" },
   { id: uuid(), link: "/dashboard/bookings", icon: "users", title: "Bookings", name: "Bookings" },
+  { id: uuid(), link: "/dashboard/invoices", icon: "users", title: "Invoices", name: "Invoices" },
   {
     id: uuid(),
     title: "Settings",
