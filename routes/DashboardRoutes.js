@@ -43,6 +43,7 @@ export const DashboardMenu = [
   { id: uuid(), link: "/dashboard/employees", icon: "users", title: "Employees", name: "Employees" },
   { id: uuid(), link: "/dashboard/customers", icon: "user-check", title: "Customers", name: "Customers" },
   { id: uuid(), link: "/dashboard/rooms", icon: "users", title: "Rooms", name: "Rooms" },
+  { id: uuid(), link: "/dashboard/bookings", icon: "users", title: "Bookings", name: "Bookings" },
   {
     id: uuid(),
     title: "Settings",

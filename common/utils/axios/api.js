@@ -1,5 +1,6 @@
 export const UsersAPI = "/users";
 export const EmployeesApi = "/employees";
+export const BookingsApi = "/bookings";
 export const RoomsApi = "/rooms";
 export const CustomersApi = "/customers";
 export const ProductCategoryApi = "/productCategories";
