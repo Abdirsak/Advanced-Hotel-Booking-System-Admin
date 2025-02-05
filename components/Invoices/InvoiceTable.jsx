@@ -41,24 +41,24 @@ const InvoiceTable = () => {
         try {
           await request({
             url: `${InvoicesApi}/${id}`,
-            method: 'PATCH',
-            data: { status: 'Cancelled' }
+            method: "PATCH",
+            data: { status: "Cancelled" },
           });
-          
+
           Swal.fire({
-            title: 'Invoice Cancelled!',
+            title: "Invoice Cancelled!",
             text: `Invoice ${invoiceNo} has been cancelled.`,
-            icon: 'success',
-            confirmButtonText: 'OK'
+            icon: "success",
+            confirmButtonText: "OK",
           });
         } catch (error) {
           Swal.fire({
-            title: 'Error!',
-            text: 'Failed to cancel invoice.',
-            icon: 'error',
-            confirmButtonText: 'OK'
+            title: "Error!",
+            text: "Failed to cancel invoice.",
+            icon: "error",
+            confirmButtonText: "OK",
           });
-          console.error('Error cancelling invoice:', error);
+          console.error("Error cancelling invoice:", error);
         }
       }
     });
@@ -82,24 +82,24 @@ const InvoiceTable = () => {
         try {
           await request({
             url: `${InvoicesApi}/${id}`,
-            method: 'PATCH',
-            data: { status: 'Paid' }
+            method: "PATCH",
+            data: { status: "Paid" },
           });
-          
+
           Swal.fire({
-            title: 'Invoice Paid!',
+            title: "Invoice Paid!",
             text: `Invoice ${invoiceNo} has been paid.`,
-            icon: 'success',
-            confirmButtonText: 'OK'
+            icon: "success",
+            confirmButtonText: "OK",
           });
         } catch (error) {
           Swal.fire({
-            title: 'Error!',
-            text: 'Failed to mark invoice as paid.',
-            icon: 'error',
-            confirmButtonText: 'OK'
+            title: "Error!",
+            text: "Failed to mark invoice as paid.",
+            icon: "error",
+            confirmButtonText: "OK",
           });
-          console.error('Error paying invoice:', error);
+          console.error("Error paying invoice:", error);
         }
       }
     });
@@ -108,14 +108,14 @@ const InvoiceTable = () => {
   // Status badge color mapping
   const getStatusBadgeColor = (status) => {
     switch (status) {
-      case 'Paid':
-        return 'success';
-      case 'Pending':
-        return 'warning';
-      case 'Cancelled':
-        return 'danger';
+      case "Paid":
+        return "success";
+      case "Pending":
+        return "warning";
+      case "Cancelled":
+        return "danger";
       default:
-        return 'secondary';
+        return "secondary";
     }
   };
 
@@ -141,9 +141,7 @@ const InvoiceTable = () => {
       sortField: "totalAmount",
       selector: (row) => row.totalAmount,
       cell: (row) => (
-        <div className="">
-          ${row.totalAmount?.toFixed(2) ?? "0.00"}
-        </div>
+        <div className="">${row.totalAmount?.toFixed(2) ?? "0.00"}</div>
       ),
     },
     {
@@ -152,9 +150,7 @@ const InvoiceTable = () => {
       sortField: "status",
       selector: (row) => row.status,
       cell: (row) => (
-        <Badge color={getStatusBadgeColor(row.status)}>
-          {row.status}
-        </Badge>
+        <Badge color={getStatusBadgeColor(row.status)}>{row.status}</Badge>
       ),
     },
     {
@@ -162,7 +158,9 @@ const InvoiceTable = () => {
       sortable: true,
       sortField: "createdBy.fullName",
       selector: (row) => row?.createdBy?.fullName ?? "",
-      cell: (row) => <div className="">{row?.createdBy?.fullName ?? "N/A"}</div>,
+      cell: (row) => (
+        <div className="">{row?.createdBy?.fullName ?? "N/A"}</div>
+      ),
     },
     {
       name: "Created Date",
@@ -179,7 +177,7 @@ const InvoiceTable = () => {
       name: "Actions",
       cell: (row) => {
         // Only show actions for Pending invoices
-        if (row.status === 'Paid' || row.status === 'Cancelled') {
+        if (row.status === "Paid" || row.status === "Cancelled") {
           return <div>-</div>;
         }
 

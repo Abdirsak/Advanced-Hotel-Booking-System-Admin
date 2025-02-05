@@ -40,11 +40,48 @@ export const DashboardMenu = [
     title: "Registertions",
     grouptitle: true,
   },
-  { id: uuid(), link: "/dashboard/employees", icon: "users", title: "Employees", name: "Employees" },
-  { id: uuid(), link: "/dashboard/customers", icon: "user-check", title: "Customers", name: "Customers" },
-  { id: uuid(), link: "/dashboard/rooms", icon: "users", title: "Rooms", name: "Rooms" },
-  { id: uuid(), link: "/dashboard/bookings", icon: "users", title: "Bookings", name: "Bookings" },
-  { id: uuid(), link: "/dashboard/invoices", icon: "users", title: "Invoices", name: "Invoices" },
+  {
+    id: uuid(),
+    link: "/dashboard/employees",
+    icon: "users",
+    title: "Employees",
+    name: "Employees",
+  },
+  {
+    id: uuid(),
+    link: "/dashboard/customers",
+    icon: "user-check",
+    title: "Customers",
+    name: "Customers",
+  },
+  {
+    id: uuid(),
+    link: "/dashboard/rooms",
+    icon: "users",
+    title: "Rooms",
+    name: "Rooms",
+  },
+  {
+    id: uuid(),
+    link: "/dashboard/bookings",
+    icon: "users",
+    title: "Bookings",
+    name: "Bookings",
+  },
+  {
+    id: uuid(),
+    link: "/dashboard/invoices",
+    icon: "users",
+    title: "Invoices",
+    name: "Invoices",
+  },
+  {
+    id: uuid(),
+    link: "/dashboard/receipts",
+    icon: "users",
+    title: "Receipts",
+    name: "Receipts",
+  },
   {
     id: uuid(),
     title: "Settings",
@@ -65,8 +102,6 @@ export const DashboardMenu = [
       { id: uuid(), link: "/dashboard/customers", name: "Customers" },
     ],
   },
-
-  
 ];
 
 export default DashboardMenu;
