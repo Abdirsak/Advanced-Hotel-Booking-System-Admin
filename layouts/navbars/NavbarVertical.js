@@ -104,14 +104,15 @@ const NavbarVertical = (props) => {
             href="/"
             className="navbar-brand d-flex align-items-center gap-2"
           >
-            <Image
+            <h3 className="text-white ms-2 fw-bold ">Hotel Booking </h3>
+            {/* <Image
               src={`${
                 settings
                   ? process.env.NEXT_PUBLIC_UPLOADS + settings.logo
                   : "/images/brand/logo/logo.svg"
               }`}
               alt=""
-            />
+            /> */}
             {settings && <h4 className="text-white">{settings.name}</h4>}
           </Link>
         </div>

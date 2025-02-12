@@ -46,10 +46,10 @@ const LoginPage = () => {
       if (res.status) {
         dispatch(setCredential({ res: res?.data, router }));
         setCookie("token", res.token, { path: "/" });
-        const token = "Bearer "+res.token
-        localStorage.setItem("token", token)
-        localStorage.setItem("user", JSON.stringify(res?.data))
-        
+        const token = "Bearer " + res.token;
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(res?.data));
+
         toast.success(res.message);
         window.location.href = "/dashboard"; // Force page reload after successful login
       } else {
@@ -76,13 +76,16 @@ const LoginPage = () => {
           <Card.Body className="p-6">
             <div className="mb-4">
               <Link href="/">
-                <Image
+                {/* <Image
                   src="/images/brand/logo/logo-primary.svg"
                   className="mb-2"
                   alt=""
-                />
+                /> */}
+                <h1 className="mb-8 h2 fw-bold text-primary">
+                  Hotel Booking System
+                </h1>
               </Link>
-              <p className="mb-6">Please login to access the system.</p>
+              <p className="mb-3">Please login to access the system.</p>
             </div>
             {/* Form */}
             <Form onSubmit={handleSubmit(onSubmit)}>
